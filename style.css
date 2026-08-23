@@ -1,0 +1,11 @@
+.navConfig {
+  display: flex; 
+  gap: 10px;
+  background-color: brown;
+}
+.menuButton {
+  width: 50%;
+}
+.logo-navbar {
+  width: 50%;
+}
