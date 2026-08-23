@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
+    <link href="https://googleapis.com" rel="stylesheet">
+
 
 
     <title>Ordo Calamitatis</title>
@@ -24,7 +26,7 @@
                 </details>
                 </div>
                 <div>
-                    <a href="localhost:8000/" class="logo-navbar">
+                    <a href="localhost:8000" class="logo-navbar">
                         <img src=".\images\logo.webp" alt="logo"> <!--Placeholder por agora-->
                     </a>
             </div>
