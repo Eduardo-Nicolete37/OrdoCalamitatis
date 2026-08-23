@@ -1,7 +1,7 @@
 .navConfig {
   display: flex; 
   gap: 10px;
-  background-color: brown;
+  background-color: #4A0606;
 }
 .menuButton {
   width: 50%;
