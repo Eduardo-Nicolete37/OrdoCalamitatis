@@ -3,13 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
     <link href="https://googleapis.com" rel="stylesheet">
+    <link rel="stylesheet" href="style/style.css">
     <title>Ordo Calamitatis</title>
 </head>
 <body>
     <header>
-        <?php include_once 'header.php'; ?>
+        <?php
+        session_start();
+        include_once 'includes/header.php'; ?>
     </header>
 </body>
 </html>
