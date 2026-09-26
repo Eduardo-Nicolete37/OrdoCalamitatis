@@ -13,10 +13,10 @@ function consultaUser($conexao, $email)
         $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
         return $usuario;
     } catch (PDOException $e) {
-        if ($e->getCode() == '23502') {
+        if ($e->getCode() == '23502') { // Esse erro apita quando algum campo é enviado como null (Sendo que a coluna é NOT NULL)
             echo "Preencha todos os campos obrigatórios!";
         } elseif ($e->getCode() == '23514') {
-            echo "Email inválido! Tente novamente.";
+            echo "Email inválido! Tente novamente."; // Caso o email enviado vá contra o regex
         } else {
 
             echo "Erro: " . $e->getMessage();
@@ -40,11 +40,11 @@ function cadastraUser($conexao, $username, $email, $passwd)
         return True;
     } catch (PDOException $e) {
         if ($e->getCode() == '23505') {
-            echo "Registro já existe.";
+            echo "Registro já existe."; // Caso o registro já exista
         } elseif ($e->getCode() == '23502') {
-            echo "Preencha todos os campos obrigatórios!";
+            echo "Preencha todos os campos obrigatórios!";// Esse erro apita quando algum campo é enviado como null (Sendo que a coluna é NOT NULL)
         } elseif ($e->getCode() == '23514') {
-            echo "Email inválido! Tente novamente.";
+            echo "Email inválido! Tente novamente."; // Caso o email enviado vá contra o regex
         } else {
             echo "Erro: " . $e->getMessage();
         }
