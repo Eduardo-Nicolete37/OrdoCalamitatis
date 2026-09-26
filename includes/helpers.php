@@ -13,7 +13,14 @@ function consultaUser($conexao, $email)
         $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
         return $usuario;
     } catch (PDOException $e) {
-        echo "Erro: " . $e->getMessage();
+        if ($e->getCode() == '23502') {
+            echo "Preencha todos os campos obrigatórios!";
+        } elseif ($e->getCode() == '23514') {
+            echo "Email inválido! Tente novamente.";
+        } else {
+
+            echo "Erro: " . $e->getMessage();
+        }
         return false;
     }
     echo '<br>' . "<a href='/mini_sistema'>Retorne aqui</a>";
@@ -32,8 +39,12 @@ function cadastraUser($conexao, $username, $email, $passwd)
         $stmt->execute();
         return True;
     } catch (PDOException $e) {
-        if ($e->getCode() === '23505') {
+        if ($e->getCode() == '23505') {
             echo "Registro já existe.";
+        } elseif ($e->getCode() == '23502') {
+            echo "Preencha todos os campos obrigatórios!";
+        } elseif ($e->getCode() == '23514') {
+            echo "Email inválido! Tente novamente.";
         } else {
             echo "Erro: " . $e->getMessage();
         }
