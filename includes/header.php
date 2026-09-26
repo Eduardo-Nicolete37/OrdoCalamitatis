@@ -24,7 +24,7 @@
 if (isset($_SESSION['id'])){
     echo "<div class='authLinks'>";
     echo "<details>";
-    echo "<summary>Administrador</summary>";
+    echo "<summary>Administrador - " . $_SESSION['username'] . "</summary>";
     echo "<ul>";
     echo "<li><a href='/app/new_char.php'>Novo Personagem</a></li>";
     echo "<li><a href='/app/char.php'>Seus Personagens</a></li>";

@@ -38,9 +38,9 @@
                 if ($usuario['email'] == $_POST['email'] && password_verify($passwd,$usuario['passwd'])) {
                     session_start();
                     $_SESSION['id'] = $usuario['id'];
-                    echo "Entrando...";
-                    sleep(3);
-                    header("Location: /OrdoCalamitatis/");
+                    $_SESSION['username'] = $usuario['username'];
+                    sleep(2);
+                    header("Location: ../");
                     exit();
                 } else {
                     echo "<hr>";
