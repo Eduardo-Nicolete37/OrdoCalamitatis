@@ -38,16 +38,20 @@
             include '../includes/footer.php'; //Chamamos o footer que está nos includes
             // Esse if serve para o php somente comece no momento em que o formulário seja submetido
             if ($_SERVER['REQUEST_METHOD'] == "POST") {
-                if ($_POST['senha'] !== $_POST['senhaConfirm']) {
-                    echo "Suas senhas não são iguais, tente novamente!";
+                if (!isset($_POST['email']) || !isset($_POST['senha']) || !isset($_POST['username']) || !isset($_POST['senhaConfirm'])) {
+                    echo "Formulário inválido! Campos faltando.";
                 } else {
-                    $username = $_POST['username']; // Para facilitar a intepretação do código, inserimos os POSTs dentro de váriaveis
-                    $email = $_POST['email'];
-                    $passwd = password_hash($_POST['senha'], PASSWORD_DEFAULT); // Colocamos a senha recebida dentro de um HASH
-                    if (cadastraUser($conexao, $username, $email, $passwd)) // Chamamos a função do helpers.php 
-                    {
-                        echo "Cadastro feito com sucesso! <br>";
-                        echo "Entre por <a href='./login.php'>aqui</a>";
+                    if ($_POST['senha'] !== $_POST['senhaConfirm']) {
+                        echo "Suas senhas não são iguais, tente novamente!";
+                    } else {
+                        $username = $_POST['username']; // Para facilitar a intepretação do código, inserimos os POSTs dentro de váriaveis
+                        $email = $_POST['email'];
+                        $passwd = password_hash($_POST['senha'], PASSWORD_DEFAULT); // Colocamos a senha recebida dentro de um HASH
+                        if (cadastraUser($conexao, $username, $email, $passwd)) // Chamamos a função do helpers.php 
+                        {
+                            echo "Cadastro feito com sucesso! <br>";
+                            echo "Entre por <a href='./login.php'>aqui</a>";
+                        }
                     }
                 }
             }

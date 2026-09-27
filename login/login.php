@@ -13,10 +13,10 @@
 <body>
     <div class="create">
         <header>
-        <?php
-        include '..\includes\header.php'; // Chamamos o header que está nos includes
-        ?>
-        <h1>Acesse o sistema: </h1>
+            <?php
+            include '..\includes\header.php'; // Chamamos o header que está nos includes
+            ?>
+            <h1>Acesse o sistema: </h1>
         </header>
         <hr>
         <main>
@@ -32,19 +32,23 @@
             <?php
             // Esse if serve para o php somente comece no momento em que o formulário seja submetido
             if ($_SERVER['REQUEST_METHOD'] == "POST") {
-                $email = $_POST['email'];
-                $passwd = $_POST['senha']; // Para facilitar a intepretação do código, inserimos os POSTs dentro de váriaveis
-                $usuario = consultaUser($conexao, $email); // Chamamos a função do helpers.php
-                if ($usuario['email'] == $_POST['email'] && password_verify($passwd,$usuario['passwd'])) {
-                    session_start();
-                    $_SESSION['id'] = $usuario['id'];
-                    $_SESSION['username'] = $usuario['username'];
-                    sleep(2);
-                    header("Location: ../");
-                    exit();
+                if (!isset($_POST['email']) || !isset($_POST['senha'])) {
+                    echo "Formulário inválido! Campos faltando.";
                 } else {
-                    echo "<hr>";
-                    echo "Usuário e/ou senha inválidos! Tente novamente";
+                    $email = $_POST['email'];
+                    $passwd = $_POST['senha']; // Para facilitar a intepretação do código, inserimos os POSTs dentro de váriaveis
+                    $usuario = consultaUser($conexao, $email); // Chamamos a função do helpers.php
+                    if ($usuario['email'] == $_POST['email'] && password_verify($passwd, $usuario['passwd'])) {
+                        session_start();
+                        $_SESSION['id'] = $usuario['id'];
+                        $_SESSION['username'] = $usuario['username'];
+                        sleep(2);
+                        header("Location: ../");
+                        exit();
+                    } else {
+                        echo "<hr>";
+                        echo "Usuário e/ou senha inválidos! Tente novamente";
+                    }
                 }
             }
 
