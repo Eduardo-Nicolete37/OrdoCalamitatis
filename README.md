@@ -276,7 +276,14 @@ flowchart TD
 
 ## 9. Contato & Suporte
 
-- **Autor**:
-- **Email**:
-- **GitHub**:
-- **Issues**:
+
+- **Autor**: Eduardo Nicolete
+- **Email**: eduardonicolete79@gmail.com
+- **GitHub**: github.com/Eduardo-Nicolete37
+
+
+<!--
+TODO:
+- Adicionar os livro do mestre o do player em anexo, numa página separada
+-->
+
