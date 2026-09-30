@@ -36,8 +36,7 @@ O sistema visa otimizar a pesquisa sobre essas temáticas e estruturar as criaç
   - [Entidade: `[nome_tabela2]`](#entidade-nome_tabela2)
 - [6. Diagramas](#6-diagramas)
   - [6.1. Diagrama Entidade-Relacionamento (MER)](#61-diagrama-entidade-relacionamento-mer)
-  - [6.2. Diagrama de Casos de Uso](#62-diagrama-de-casos-de-uso)
-  - [6.3. Fluxo de \[Processo\]](#63-fluxo-de-processo)
+  - [6.2. Fluxo de \[Processo\]](#62-fluxo-de-processo)
 - [7. Protótipos](#7-protótipos)
   - [Baixa Fidelidade:](#baixa-fidelidade)
   - [Alta Fidelidade:](#alta-fidelidade)
@@ -179,6 +178,7 @@ OrdoCalamitatis
 | **RF10** | Associar Item a Personagem | O sistema deve permitir que personagens possuam itens | Média | ⬜ |
 | **RF11** | Associar Ritual a Personagem | O sistema deve permitir que personagens dominem rituais | Média | ⬜ |
 | **RF12** | Associar Criação a Temporada | O sistema deve ligar criações a temporadas específicas | Média | ⬜ |
+| **RF13** | Disponibilizar Livros de Referência | O sistema deve disponibilizar, em uma página separada, os livros do Mestre e do Player anexados ao projeto para consulta dos usuários. | Baixa | ⬜ |
 
 
 ### 4.2. Requisitos Não-Funcionais
@@ -250,32 +250,61 @@ erDiagram
     
     TABELA1 ||--o{ TABELA2 : "relacionamento"
 ```
-
-### 6.2. Diagrama de Casos de Uso
-
-```mermaid
-flowchart LR
-    Usuario["Usuário"]
-    
-    subgraph Sistema["Nome do Sistema"]
-        UC01(["Caso de Uso 1"])
-        UC02(["Caso de Uso 2"])
-    end
-    
-    Usuario --- UC01
-    Usuario --- UC02
-```
-
-### 6.3. Fluxo de [Processo]
+### 6.2. Fluxo de [Processo]
 
 ```mermaid
 flowchart TD
-    A([Início]) --> B[Ação 1]
-    B --> C{Decisão?}
-    C -->|Sim| D[Resultado 1]
-    C -->|Não| E[Resultado 2]
-    D --> F([Fim])
-    E --> F
+    A([Início]) --> B["Acessar o sistema"]
+
+    B --> C["Área do Usuário"]
+
+    C --> D{"Qual funcionalidade deseja acessar?"}
+
+    %% Funcionalidades disponíveis na área do usuário
+    D -->|Consultar| E["Consultar Personagens, Itens ou Rituais"]
+    D -->|Criar| F["Criar Personagem, Item ou Ritual"]
+    D -->|Editar| G["Editar Criação"]
+    D -->|Excluir| H["Excluir Criação"]
+    D -->|Área Administrativa| I["Acessar rota administrativa"]
+
+    %% Funcionalidades que não exigem login
+    E --> J["Exibir informações"]
+    J --> Z([Fim])
+
+    %% Funcionalidades que exigem autenticação
+    F --> K{"Está autenticado?"}
+    G --> K
+    H --> K
+    I --> K
+
+    K -->|Não| L["Redirecionar para Login"]
+    L --> M["Informar email e senha"]
+    M --> N{"Credenciais válidas?"}
+
+    N -->|Não| O["Exibir erro de autenticação"]
+    O --> M
+
+    N -->|Sim| P{"É Administrador?"}
+
+    %% Usuário autenticado
+    P -->|Não| Q["Área do Usuário"]
+    P -->|Sim| R["Painel Administrativo"]
+
+    %% Operações do usuário
+    Q --> S["Executar funcionalidade solicitada"]
+    S --> Z
+
+    %% Área administrativa
+    R --> T["Gerenciar funcionalidades administrativas"]
+    T --> Z
+
+    %% Usuário já autenticado tentando acessar Admin
+    I --> U{"É Administrador?"}
+    U -->|Não| V["Acesso negado"]
+    U -->|Sim| R
+
+    V --> Z
+
 ```
 
 ---
@@ -289,7 +318,6 @@ flowchart TD
 ---
 
 ### Alta Fidelidade:
-
  - [Clique aqui para ver](https://www.figma.com/design/UTbWf2dmiM2E0KfQ6hpcI6/Prot%C3%B3tipo---Ordo-Calamitatis?node-id=0-1&t=HHRskXJG7ZlVPTdt-1)
 
 ---
@@ -309,10 +337,3 @@ flowchart TD
 - **Autor**: Eduardo Nicolete
 - **Email**: eduardonicolete79@gmail.com
 - **GitHub**: github.com/Eduardo-Nicolete37
-
-
-<!--
-TODO:
-- Adicionar os livro do mestre o do player em anexo, numa página separada
--->
-
