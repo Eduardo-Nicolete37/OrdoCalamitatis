@@ -1,5 +1,6 @@
-# Ordo Calamitatis - Sistema de Gerenciamento de Personagens
-<div style="text-align: center">
+<h1 align="center">Ordo Calamitatis</h1>
+<h2 align="center">Sistema de Gerenciamento de Personagens</h2>
+<div align="center">
 
 ![PHP](https://img.shields.io/badge/PHP-777BB4?style=for-the-badge&logo=php&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-000?style=for-the-badge&logo=postgresql) 
@@ -17,19 +18,31 @@ O sistema visa otimizar a pesquisa sobre essas temáticas e estruturar as criaç
 
 ## 1. Índice
 
-- [Como Executar o Projeto Localmente](#como-executar-o-projeto-localmente)
-- [Pré-Requisitos](#pré-requisitos)
-- [Instalação](#instalação)
-- [Configuração](#configuração)
-- [Estrutura de Diretórios](#estrutura-de-diretórios)
-- [Uso](#uso)
-- [Especificação de Requisitos](#especificação-de-requisitos)
-- [Estrutura do Banco de Dados](#estrutura-do-banco-de-dados)
-- [Diagramas](#diagramas)
-- [Troubleshooting](#troubleshooting)
-- [Contribuindo](#contribuindo)
-- [Licença](#licença)
-- [Contato](#contato)
+- [1. Índice](#1-índice)
+- [2. Como Executar o Projeto Localmente](#2-como-executar-o-projeto-localmente)
+  - [2.1. Pré-Requisitos](#21-pré-requisitos)
+  - [2.2. Instalação](#22-instalação)
+    - [Passo 1: Clonar o Repositório](#passo-1-clonar-o-repositório)
+    - [Passo 2: Configurar o Banco de Dados](#passo-2-configurar-o-banco-de-dados)
+    - [Passo 3: Configurar a Conexão no PHP](#passo-3-configurar-a-conexão-no-php)
+    - [Passo 4: Acessar a Aplicação localmente](#passo-4-acessar-a-aplicação-localmente)
+- [3. Estrutura de Diretórios (INCOMPLETO)](#3-estrutura-de-diretórios-incompleto)
+- [4. Especificação de Requisitos](#4-especificação-de-requisitos)
+  - [4.1. Requisitos Funcionais](#41-requisitos-funcionais)
+  - [4.2. Requisitos Não-Funcionais](#42-requisitos-não-funcionais)
+  - [4.3. Regras de Negócio](#43-regras-de-negócio)
+- [5. Estrutura do Banco de Dados](#5-estrutura-do-banco-de-dados)
+  - [Entidade: `userTabela`](#entidade-usertabela)
+  - [Entidade: `[nome_tabela2]`](#entidade-nome_tabela2)
+- [6. Diagramas](#6-diagramas)
+  - [6.1. Diagrama Entidade-Relacionamento (MER)](#61-diagrama-entidade-relacionamento-mer)
+  - [6.2. Diagrama de Casos de Uso](#62-diagrama-de-casos-de-uso)
+  - [6.3. Fluxo de \[Processo\]](#63-fluxo-de-processo)
+- [7. Protótipos](#7-protótipos)
+  - [Baixa Fidelidade:](#baixa-fidelidade)
+  - [Alta Fidelidade:](#alta-fidelidade)
+- [8. Contribuindo](#8-contribuindo)
+- [9. Contato \& Suporte](#9-contato--suporte)
 
 ---
 
@@ -110,7 +123,9 @@ Por fim, abra no seu navegador de preferencia, digite o URL *localhost:8000*, e 
 ---
 
 ## 3. Estrutura de Diretórios (INCOMPLETO)
-<!--TODO: Comentar os arquivos-->
+<!--TODO: Comentar os arquivos
+✅⬜
+-->
 ```
 OrdoCalamitatis
 │   .gitignore
@@ -152,18 +167,18 @@ OrdoCalamitatis
 
 | ID | Título | Descrição | Prioridade | Feito? |
 |----|--------|-----------|------------|---------|
-| **RF01** | Autenticação de Usuários | O sistema deve validar credenciais (email/senha) e criar sessão autenticada | Alta |<input type="checkbox" checked>|
-| **RF02** | Cadastro de Usuários | O sistema deve permitir novo registro com validação de email único | Alta | <input type="checkbox" checked> |
-| **RF03** | Proteção de Rotas | Páginas de usuário devem redirecionar para login se não autenticado | Alta | <input type="checkbox" checked> |
-| **RF04** | Logout Seguro | Destruir sessão e limpar dados de autenticação | Alta | <input type="checkbox" checked> |
-| **RF05** | Criar Criações | O sistema deve fornecer formulários separados para Personagem, Item e Ritual | Alta | <input type="checkbox"> |
-| **RF06** | Listar Criações | O sistema deve exibir todas as criações do usuário | Alta | <input type="checkbox"> |
-| **RF07** | Editar Criações | O sistema deve permitir atualização de qualquer criação do próprio e somente do usuário | Alta | <input type="checkbox"> |
-| **RF08** | Remover Criações | O sistema deve remover criações com confirmação de segurança | Alta | <input type="checkbox"> |
-| **RF09** | Ver Detalhes | O sistema deve exibir informações completas de cada criação | Média | <input type="checkbox"> |
-| **RF10** | Associar Item a Personagem | O sistema deve permitir que personagens possuam itens | Média | <input type="checkbox"> |
-| **RF11** | Associar Ritual a Personagem | O sistema deve permitir que personagens possuam itens | Média | <input type="checkbox"> |
-| **RF12** | Associar Criação a Temporada | O sistema deve permitir que personagens possuam itens | Média | <input type="checkbox"> |
+| **RF01** | Autenticação de Usuários | O sistema deve validar credenciais (email/senha) e criar sessão autenticada | Alta |✅|
+| **RF02** | Cadastro de Usuários | O sistema deve permitir novo registro com validação de email único | Alta | ✅ |
+| **RF03** | Proteção de Rotas | Páginas de usuário devem redirecionar para login se não autenticado | Alta | ✅ |
+| **RF04** | Logout Seguro | Destruir sessão e limpar dados de autenticação | Alta | ✅ |
+| **RF05** | Criar Criações | O sistema deve fornecer formulários separados para Personagem, Item e Ritual | Alta | ⬜ |
+| **RF06** | Listar Criações | O sistema deve exibir todas as criações do usuário | Alta | ⬜ |
+| **RF07** | Editar Criações | O sistema deve permitir atualização de qualquer criação do próprio e somente do usuário | Alta | ⬜ |
+| **RF08** | Remover Criações | O sistema deve remover criações com confirmação de segurança | Alta | ⬜ |
+| **RF09** | Ver Detalhes | O sistema deve exibir informações completas de cada criação | Média | ⬜ |
+| **RF10** | Associar Item a Personagem | O sistema deve permitir que personagens possuam itens | Média | ⬜ |
+| **RF11** | Associar Ritual a Personagem | O sistema deve permitir que personagens dominem rituais | Média | ⬜ |
+| **RF12** | Associar Criação a Temporada | O sistema deve ligar criações a temporadas específicas | Média | ⬜ |
 
 
 ### 4.2. Requisitos Não-Funcionais
@@ -171,27 +186,40 @@ OrdoCalamitatis
 
 | ID | Título | Descrição | Prioridade | Feito? |
 |----|--------|-----------|------------|--------|
-| **RNF01** | Linguagem | Back-end desenvolvido em PHP 7.4+ | Alta | <input type="checkbox" checked>
-| **RNF02** | | | |
+| **RNF01** | Linguagem | Back-end desenvolvido em PHP 7.4+ | Alta | ✅ |
+| **RNF02** | Banco de Dados | PostgreSQL 12+ | Alta | ✅ |
+| **RNF03** | Padrão CRUD | Separação clara de camadas (conexão, lógica, apresentação) | Alta | ✅ |
+| **RNF04** | Proteção SQL Injection | Todos os queries devem usar prepared statements | Alta | ✅ |
+| **RNF05** | Criptografia de Senha | Usar password_hash() com PASSWORD_DEFAULT | Alta | ✅ |
+| **RNF06** | Sessões Seguras | Usar $_SESSION com controle de acesso por user_id | Alta | ✅ |
+| **RNF07** | Upload de Imagem | Restringir a JPG/PNG, máx 2MB, renomear com hash | Média | ⬜ |
+| **RNF08** | Design Consistente | Variáveis CSS e tema escuro (#1A1A1E) | Média | ✅ |
 
 ### 4.3. Regras de Negócio
 
 | ID | Regra | Descrição |
 |----|-------|-----------|
-| **RN01** | | |
-| **RN02** | | |
+| **RN01** | Propriedade Exclusiva | Usuário só pode editar/deletar suas próprias criações |
+| **RN02** | Email Único | Não permitir cadastro com email duplicado (constraint UNIQUE) |
+| **RN03** | Autenticação Obrigatória | Páginas de criações só acessíveis com sessão ativa |
+| **RN04** | Campos Obrigatórios | Nome é obrigatório para todas as criações |
+| **RN05** | Validação Email | Deve estar em formato válido (regex) |
+| **RN06** | Sem Duplicação M:M | Um personagem não pode ter o mesmo item 2x |
 
 ---
 
 ## 5. Estrutura do Banco de Dados
 
-### Entidade: `[nome_tabela]`
+### Entidade: `userTabela`
 
 | Campo | Tipo | Restrições | Descrição |
 |-------|------|-----------|-----------|
-| `id` | SERIAL | PRIMARY KEY | |
-| `campo1` | VARCHAR(255) | | |
-| `campo2` | INT | | |
+| `id` | SERIAL | PRIMARY KEY | Identificador único do usuário |
+| `username` | VARCHAR(255) | UNIQUE NOT NULL | Nome de usuário único para identificação na plataforma |
+| `email` | *typeEmail | UNIQUE NOT NULL REGEX | Email único de autenticação com validação de formato através de regex |
+| `passwd` | TEXT | NOT NULL | Senha criptografada usando `password_hash()` do PHP com algoritmo PASSWORD_DEFAULT, nunca armazenada em texto plano |
+
+* *typeEmail* é um dominio personalizado que força à o input ser na estrutura de um email, é do tamanho de um TEXT
 
 ### Entidade: `[nome_tabela2]`
 
@@ -209,8 +237,10 @@ OrdoCalamitatis
 ```mermaid
 erDiagram
     TABELA1 {
-        int id PK
-        string campo1
+        int ID pk
+        username varchar(255) "Unique/Not Null"
+        email TEXT "Unique/Not Null/Dominio especifico"
+        passwdHash TEXT "Not Null"
     }
     
     TABELA2 {
@@ -260,7 +290,7 @@ flowchart TD
 
 ### Alta Fidelidade:
 
-<!--TODO: POR O LINK-->
+ - [Clique aqui para ver](https://www.figma.com/design/UTbWf2dmiM2E0KfQ6hpcI6/Prot%C3%B3tipo---Ordo-Calamitatis?node-id=0-1&t=HHRskXJG7ZlVPTdt-1)
 
 ---
 
@@ -276,7 +306,13 @@ flowchart TD
 
 ## 9. Contato & Suporte
 
-- **Autor**:
-- **Email**:
-- **GitHub**:
-- **Issues**:
+- **Autor**: Eduardo Nicolete
+- **Email**: eduardonicolete79@gmail.com
+<br> 
+ - [![GitHub](https://img.shields.io/badge/GitHub-Eduardo--Nicolete37-181717?style=flat-square&logo=github)](https://github.com/Eduardo-Nicolete37)
+
+
+<!--
+TODO:
+- Adicionar os livro do mestre o do player em anexo, numa página separada
+-->
