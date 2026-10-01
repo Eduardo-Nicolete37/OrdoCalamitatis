@@ -33,21 +33,24 @@
             // Esse if serve para o php somente comece no momento em que o formulário seja submetido
             if ($_SERVER['REQUEST_METHOD'] == "POST") {
                 if (!isset($_POST['email']) || !isset($_POST['senha'])) {
-                    echo "Formulário inválido! Campos faltando.";
+                    echo "Formulário inválido! Tente novamente.";
                 } else {
-                    $email = $_POST['email'];
-                    $passwd = $_POST['senha']; // Para facilitar a intepretação do código, inserimos os POSTs dentro de váriaveis
-                    $usuario = consultaUser($conexao, $email); // Chamamos a função do helpers.php
-                    if ($usuario['email'] == $_POST['email'] && password_verify($passwd, $usuario['passwd'])) {
+                    $email = $_POST['email']; 
+                    $passwd = $_POST['senha'];
+
+                    $usuario = consultaUser($conexao, $email);
+
+                    if ($usuario === false) {
+                        $erro = "Usuário não encontrado!";
+                    } elseif (!password_verify($passwd, $usuario['passwd'])) {
+                        $erro = "Senha incorreta!";
+                    } else {
                         session_start();
                         $_SESSION['id'] = $usuario['id'];
                         $_SESSION['username'] = $usuario['username'];
-                        sleep(2);
+                        sleep(1);
                         header("Location: ../");
                         exit();
-                    } else {
-                        echo "<hr>";
-                        echo "Usuário e/ou senha inválidos! Tente novamente";
                     }
                 }
             }
