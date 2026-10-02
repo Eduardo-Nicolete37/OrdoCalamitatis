@@ -16,7 +16,7 @@
             <?php
             include '..\includes\header.php'; // Chamamos o header que está nos includes
             ?>
-            <h1>Acesse o sistema: </h1>
+            <h1>Acesse o sistema</h1>
         </header>
         <hr>
         <main>
@@ -25,7 +25,6 @@
                 <input type="email" name="email" id="email" required>
                 <label for="senha">Senha: </label>
                 <input type="password" name="senha" id="senha" required>
-                <input type="reset" value="Limpar">
                 <input type="submit" value="Enviar">
             </form>
             <p>Não tem cadastro? <a href="./cadastrar.php">Cadastre-se aqui</a></p>

@@ -16,7 +16,7 @@
         include '../includes/header.php'; // Chamamos o header que está nos includes
         ?>
         <header>
-            <h1>Registre-se no sistema: </h1>
+            <h1>Registre-se no sistema</h1>
         </header>
         <hr>
         <main>
@@ -29,7 +29,6 @@
                 <input type="password" name="senha" id="senha" required>
                 <label for="senhaConfirm">Confirme a senha: </label>
                 <input type="password" name="senhaConfirm" id="senhaConfirm" required>
-                <input type="reset" value="Limpar">
                 <input type="submit" value="Enviar">
             </form>
             <p>Já tem cadastro? <a href="./login.php">Entre aqui</a></p>
