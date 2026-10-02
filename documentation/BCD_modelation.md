@@ -22,7 +22,28 @@ playersTabela {
 }
 charactersTabela {
     int ID PK "Auto Increment"
-    varchar name "Not Null"
+    VARCHAR(255) name "Not Null"
+    VARCHAR(255) img "Null"
+    int agi "Not Null"
+    int for "Not Null"
+    int int "Not Null"
+    int pre "Not Null"
+    int vig "Not Null"
+    VARCHAR(255) ocupation "Not Null"
+    VARCHAR(255) history "Not Null"
+    VARCHAR(255) characte "Not Null"
+    VARCHAR(12) class "Not Null"
+    INT nex "Not Null"
+}
+itemsTabela {
+    int ID PK "Auto Increment"
+    VARCHAR(255) name "Not Null"
+    VARCHAR(255) img "Null"
+    VARCHAR(255) type_item "Not Null"
+    VARCHAR(255) damage "Not Null"
+    VARCHAR(255) effect "Not Null"
+    VARCHAR(255) range "Not Null"
+    INT prestige "Not Null"
 }
 player_temporadas {
     int player_id FK

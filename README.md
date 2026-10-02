@@ -256,27 +256,27 @@ erDiagram
 flowchart TD
     A([Início]) --> B["Acessar o sistema"]
 
-    B --> C["Área do Usuário"]
+    B --> C["Área Pública"]
 
     C --> D{"Qual funcionalidade deseja acessar?"}
 
-    %% Funcionalidades disponíveis na área do usuário
+    %% Funcionalidade pública (sem login)
     D -->|Consultar| E["Consultar Personagens, Itens ou Rituais"]
-    D -->|Criar| F["Criar Personagem, Item ou Ritual"]
-    D -->|Editar| G["Editar Criação"]
-    D -->|Excluir| H["Excluir Criação"]
-    D -->|Área Administrativa| I["Acessar rota administrativa"]
+    E --> F["Exibir informações"]
+    F --> Z([Fim])
 
-    %% Funcionalidades que não exigem login
-    E --> J["Exibir informações"]
-    J --> Z([Fim])
+    %% Funcionalidades restritas ao administrador
+    D -->|Criar| G["Criar Personagem, Item ou Ritual"]
+    D -->|Editar| H["Editar Criação"]
+    D -->|Excluir| I["Excluir Criação"]
+    D -->|Área Administrativa| J["Acessar rota administrativa"]
 
-    %% Funcionalidades que exigem autenticação
-    F --> K{"Está autenticado?"}
-    G --> K
+    G --> K{"Administrador autenticado?"}
     H --> K
     I --> K
+    J --> K
 
+    %% Fluxo de autenticação
     K -->|Não| L["Redirecionar para Login"]
     L --> M["Informar email e senha"]
     M --> N{"Credenciais válidas?"}
@@ -284,26 +284,12 @@ flowchart TD
     N -->|Não| O["Exibir erro de autenticação"]
     O --> M
 
-    N -->|Sim| P{"É Administrador?"}
+    N -->|Sim| P["Painel Administrativo"]
+    K -->|Sim| P
 
-    %% Usuário autenticado
-    P -->|Não| Q["Área do Usuário"]
-    P -->|Sim| R["Painel Administrativo"]
-
-    %% Operações do usuário
-    Q --> S["Executar funcionalidade solicitada"]
-    S --> Z
-
-    %% Área administrativa
-    R --> T["Gerenciar funcionalidades administrativas"]
-    T --> Z
-
-    %% Usuário já autenticado tentando acessar Admin
-    I --> U{"É Administrador?"}
-    U -->|Não| V["Acesso negado"]
-    U -->|Sim| R
-
-    V --> Z
+    %% Operações do administrador
+    P --> Q["Executar funcionalidade solicitada"]
+    Q --> Z
 
 ```
 
@@ -313,12 +299,12 @@ flowchart TD
 
 ### Baixa Fidelidade: 
 
-<!--TODO: POR O LINK-->
+  - [Veja aqui - ExcaliDraw](https://excalidraw.com/#json=mOz5fB1gU0QkTu2AIVhdC,fJeDVOdbInvNZ659q8qCpA)
 
 ---
 
 ### Alta Fidelidade:
- - [Clique aqui para ver](https://www.figma.com/design/UTbWf2dmiM2E0KfQ6hpcI6/Prot%C3%B3tipo---Ordo-Calamitatis?node-id=0-1&t=HHRskXJG7ZlVPTdt-1)
+ - [Veja aqui - Figma](https://www.figma.com/design/UTbWf2dmiM2E0KfQ6hpcI6/Prot%C3%B3tipo---Ordo-Calamitatis?node-id=0-1&t=HHRskXJG7ZlVPTdt-1)
 
 ---
 
@@ -337,3 +323,8 @@ flowchart TD
 - **Autor**: Eduardo Nicolete
 - **Email**: eduardonicolete79@gmail.com
 - **GitHub**: github.com/Eduardo-Nicolete37
+
+<!--
+$id = isset($_GET['id']) ? intval($_GET['id']) : 0;
+Para retirar o ID do personagem da URL
+-->
