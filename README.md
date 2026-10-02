@@ -219,7 +219,11 @@ OrdoCalamitatis
 | `email` | *typeEmail | UNIQUE NOT NULL REGEX | Email único de autenticação com validação de formato através de regex |
 | `passwd` | TEXT | NOT NULL | Senha criptografada usando `password_hash()` do PHP com algoritmo PASSWORD_DEFAULT, nunca armazenada em texto plano |
 
-* *typeEmail* é um dominio personalizado que força à o input ser na estrutura de um email, é do tamanho de um TEXT
+* *typeEmail* é um dominio personalizado que força à o input ser na estrutura de um email, é do tamanho de um TEXT, usado os comandos:
+```sql
+CREATE DOMAIN typeEmail AS TEXT
+CHECK (VALUE ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$'); 
+```
 
 ### Entidade: `[nome_tabela2]`
 
