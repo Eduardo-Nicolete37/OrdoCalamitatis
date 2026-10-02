@@ -27,7 +27,7 @@ if (isset($_SESSION['id'])){
     echo "<summary>Administrador - " . $_SESSION['username'] . "</summary>";
     echo "<ul>";
     echo "<li><a href='/app/new_char.php'>Novo Personagem</a></li>";
-    echo "<li><a href='/app/char.php'>Seus Personagens</a></li>";
+    echo "<li><a href='/app/creations.php'>Suas Criações</a></li>";
     echo "<li><a href='/app/new_item.php'>Novo Item</a></li>";
     echo "<li><a href='/app/new_ritual.php'>Novo Ritual</a></li>";
     echo "<li><a href='../login/logout.php'>Log-Out</a></li>";
