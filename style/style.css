@@ -50,7 +50,7 @@ nav {
     background-color: #6A0808;
 }
 
-.menuButton details[open] > summary {
+.menuButton details[open]>summary {
     background-color: #6A0808;
 }
 
@@ -95,6 +95,7 @@ nav {
     height: 50px;
     width: auto;
 }
+
 .navConfig {
     display: flex;
     background-color: #4A0606;
@@ -109,7 +110,7 @@ nav {
     width: 33.33%;
 }
 
-.navConfig > div:nth-child(2) {
+.navConfig>div:nth-child(2) {
     width: 33.33%;
     display: flex;
     justify-content: center;
@@ -123,7 +124,7 @@ nav {
 }
 
 
-.navConfig > div:last-child a {
+.navConfig>div:last-child a {
     padding: 8px 8px;
 }
 
@@ -164,7 +165,7 @@ nav {
     background-color: #6A0808;
 }
 
-.navConfig details[open] > summary {
+.navConfig details[open]>summary {
     background-color: #6A0808;
 }
 
@@ -209,6 +210,7 @@ main {
     padding: 20px;
     color: lightgray;
 }
+
 .pdfs {
     margin: 30px auto;
     text-align: left;
@@ -331,7 +333,7 @@ a:hover {
         padding: 15px;
     }
 
-    .navConfig > div:last-child {
+    .navConfig>div:last-child {
         width: 100%;
         justify-content: center;
     }
