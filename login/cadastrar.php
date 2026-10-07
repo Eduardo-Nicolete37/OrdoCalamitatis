@@ -22,13 +22,13 @@
         <main>
             <form action="" method="POST">
                 <label for="username">Usuário: </label>
-                <input type="text" name="username" id="username" required>
+                <input type="text" name="username" id="username" required placeholder="John Doe">
                 <label for="email">Email: </label>
-                <input type="email" name="email" id="email" required>
+                <input type="email" name="email" id="email" required placeholder="seuemail@gmail.com">
                 <label for="senha">Senha: </label>
-                <input type="password" name="senha" id="senha" required>
+                <input type="password" name="senha" id="senha" required placeholder="********">
                 <label for="senhaConfirm">Confirme a senha: </label>
-                <input type="password" name="senhaConfirm" id="senhaConfirm" required>
+                <input type="password" name="senhaConfirm" id="senhaConfirm" required placeholder="********">
                 <input type="submit" value="Enviar">
             </form>
             <p>Já tem cadastro? <a href="./login.php">Entre aqui</a></p>

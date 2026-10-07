@@ -22,9 +22,9 @@
         <main>
             <form action="" method="POST">
                 <label for="email">Email: </label>
-                <input type="email" name="email" id="email" required>
+                <input type="email" name="email" id="email" placeholder="seuemail@gmail.com">
                 <label for="senha">Senha: </label>
-                <input type="password" name="senha" id="senha" required>
+                <input type="password" name="senha" id="senha" required placeholder="********">
                 <input type="submit" value="Enviar">
             </form>
             <p>Não tem cadastro? <a href="./cadastrar.php">Cadastre-se aqui</a></p>
