@@ -12,7 +12,7 @@
 <body>
     <?php
     session_start();
-    include_once __DIR__ . "/../includes/header.php";
+    include_once __DIR__ . "/../../includes/header.php";
     ?>
     <header>
         <h1>Arquivos Secretos & Outros</h1>
