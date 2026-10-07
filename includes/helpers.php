@@ -1,6 +1,9 @@
 <?php
 require_once "../database/connect.php";
-
+// Funções relacionadas a criação de personagens
+function criaPersonagem($conexao, ){
+    
+}
 // Funções relacionadas ao Login
 function consultaUser($conexao, $email)
 {
