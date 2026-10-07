@@ -33,7 +33,15 @@ O sistema visa otimizar a pesquisa sobre essas temáticas e estruturar as criaç
   - [4.3. Regras de Negócio](#43-regras-de-negócio)
 - [5. Estrutura do Banco de Dados](#5-estrutura-do-banco-de-dados)
   - [Entidade: `userTabela`](#entidade-usertabela)
-  - [Entidade: `[nome_tabela2]`](#entidade-nome_tabela2)
+  - [Entidade: `temporadas`](#entidade-temporadas)
+  - [Entidade: `players`](#entidade-players)
+  - [Entidade: `characters`](#entidade-characters)
+  - [Entidade: `items`](#entidade-items)
+  - [Entidade: `rituals`](#entidade-rituals)
+  - [Entidade: `player_temporadas`](#entidade-player_temporadas)
+  - [Entidade: `player_characters`](#entidade-player_characters)
+  - [Entidade: `character_rituals`](#entidade-character_rituals)
+  - [Entidade: `character_items`](#entidade-character_items)
 - [6. Diagramas](#6-diagramas)
   - [6.1. Diagrama Entidade-Relacionamento (MER)](#61-diagrama-entidade-relacionamento-mer)
   - [6.2. Fluxo de \[Processo\]](#62-fluxo-de-processo)
@@ -178,7 +186,7 @@ OrdoCalamitatis
 | **RF10** | Associar Item a Personagem | O sistema deve permitir que personagens possuam itens | Média | ⬜ |
 | **RF11** | Associar Ritual a Personagem | O sistema deve permitir que personagens dominem rituais | Média | ⬜ |
 | **RF12** | Associar Criação a Temporada | O sistema deve ligar criações a temporadas específicas | Média | ⬜ |
-| **RF13** | Disponibilizar Livros de Referência | O sistema deve disponibilizar, em uma página separada, os livros do Mestre e do Player anexados ao projeto para consulta dos usuários. | Baixa | ⬜ |
+| **RF13** | Disponibilizar Livros de Referência | O sistema deve disponibilizar, em uma página separada, os livros do Mestre e do Player anexados ao projeto para consulta dos usuários. | Baixa | ✅ |
 
 
 ### 4.2. Requisitos Não-Funcionais
@@ -214,24 +222,131 @@ OrdoCalamitatis
 
 | Campo | Tipo | Restrições | Descrição |
 |-------|------|-----------|-----------|
-| `id` | SERIAL | PRIMARY KEY | Identificador único do usuário |
+| `id` | INTEGER | PRIMARY KEY GENERATED ALWAYS AS IDENTITY | Identificador único do usuário |
 | `username` | VARCHAR(255) | UNIQUE NOT NULL | Nome de usuário único para identificação na plataforma |
 | `email` | *typeEmail | UNIQUE NOT NULL REGEX | Email único de autenticação com validação de formato através de regex |
 | `passwd` | TEXT | NOT NULL | Senha criptografada usando `password_hash()` do PHP com algoritmo PASSWORD_DEFAULT, nunca armazenada em texto plano |
 
-* *typeEmail* é um dominio personalizado que força à o input ser na estrutura de um email, é do tamanho de um TEXT, usado os comandos:
+* *typeEmail* é um domínio personalizado que força o input a ter a estrutura de um email, tem o tamanho de um TEXT, criado com o comando:
 ```sql
 CREATE DOMAIN typeEmail AS TEXT
-CHECK (VALUE ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$'); 
+CHECK (VALUE ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$');
 ```
 
-### Entidade: `[nome_tabela2]`
+### Entidade: `temporadas`
 
 | Campo | Tipo | Restrições | Descrição |
 |-------|------|-----------|-----------|
-| `id` | SERIAL | PRIMARY KEY | |
-| `campo1` | VARCHAR(255) | | |
+| `id` | INTEGER | PRIMARY KEY GENERATED ALWAYS AS IDENTITY | Identificador único da temporada |
+| `name` | VARCHAR(255) | UNIQUE NOT NULL | Nome único da temporada |
+| `ano_de_comeco` | INTEGER | NOT NULL | Ano em que a temporada começou |
+| `ano_de_fim` | INTEGER | CHECK (ano_de_fim IS NULL OR ano_de_fim >= ano_de_comeco) | Ano de término da temporada. `NULL` indica que ainda está em andamento |
 
+### Entidade: `players`
+
+| Campo | Tipo | Restrições | Descrição |
+|-------|------|-----------|-----------|
+| `id` | INTEGER | PRIMARY KEY GENERATED ALWAYS AS IDENTITY | Identificador único do jogador |
+| `name` | VARCHAR(255) | UNIQUE NOT NULL | Nome único do jogador |
+
+### Entidade: `characters`
+
+| Campo | Tipo | Restrições | Descrição |
+|-------|------|-----------|-----------|
+| `id` | INTEGER | PRIMARY KEY GENERATED ALWAYS AS IDENTITY | Identificador único do personagem |
+| `name` | VARCHAR(255) | NOT NULL | Nome do personagem (pode repetir entre personagens) |
+| `img` | VARCHAR(255) | | Caminho ou URL da imagem do personagem |
+| `agi` | INTEGER | NOT NULL | Atributo Agilidade |
+| `str` | INTEGER | NOT NULL | Atributo Força |
+| `intel` | INTEGER | NOT NULL | Atributo Intelecto (renomeado de `int` para não conflitar com o tipo SQL) |
+| `pre` | INTEGER | NOT NULL | Atributo Presença |
+| `vig` | INTEGER | NOT NULL | Atributo Vigor |
+| `occupation` | VARCHAR(255) | NOT NULL | Ocupação ou profissão do personagem |
+| `history` | TEXT | NOT NULL | História de fundo do personagem (TEXT porque costuma passar de 255 caracteres) |
+| `personality` | VARCHAR(255) | NOT NULL | Traços de personalidade do personagem |
+| `class` | VARCHAR(12) | NOT NULL | Classe do personagem (ex.: Combatente, Especialista, Ocultista) |
+| `nex` | INTEGER | NOT NULL | Nível de exposição (NEX) do personagem |
+
+### Entidade: `items`
+
+| Campo | Tipo | Restrições | Descrição |
+|-------|------|-----------|-----------|
+| `id` | INTEGER | PRIMARY KEY GENERATED ALWAYS AS IDENTITY | Identificador único do item |
+| `name` | VARCHAR(255) | NOT NULL | Nome do item |
+| `img` | VARCHAR(255) | | Caminho ou URL da imagem do item |
+| `type_item` | VARCHAR(255) | NOT NULL | Categoria do item (ex.: arma, proteção, utensílio) |
+| `damage` | VARCHAR(255) | NOT NULL | Dano causado pelo item, em texto livre (ex.: "1d6") |
+| `effect` | VARCHAR(255) | NOT NULL | Efeito resumido do item |
+| `item_range` | VARCHAR(255) | NOT NULL | Alcance do item (renomeado de `range` para evitar conflito com palavra do SQL) |
+| `prestige` | INTEGER | NOT NULL | Valor de prestígio do item |
+| `description` | TEXT | NOT NULL | Descrição completa do item |
+
+### Entidade: `rituals`
+
+| Campo | Tipo | Restrições | Descrição |
+|-------|------|-----------|-----------|
+| `id` | INTEGER | PRIMARY KEY GENERATED ALWAYS AS IDENTITY | Identificador único do ritual |
+| `name` | VARCHAR(255) | NOT NULL | Nome do ritual |
+| `img` | VARCHAR(255) | | Caminho ou URL da imagem do ritual |
+| `element` | VARCHAR(255) | NOT NULL | Elemento ao qual o ritual pertence |
+| `pd_gasto` | INTEGER | NOT NULL | Custo em PD para conjurar o ritual |
+| `ritual_type` | VARCHAR(255) | NOT NULL | Tipo do ritual (renomeado de `type` para evitar confusão com palavra do SQL) |
+| `dano` | VARCHAR(255) | | Dano causado pelo ritual, em texto livre. `NULL` se não causar dano |
+| `effect` | VARCHAR(255) | | Efeito resumido do ritual. `NULL` se não houver |
+| `description` | TEXT | NOT NULL | Descrição completa do ritual |
+
+### Entidade: `player_temporadas`
+
+Tabela de conexão (N:N) entre jogadores e temporadas.
+
+| Campo | Tipo | Restrições | Descrição |
+|-------|------|-----------|-----------|
+| `id` | INTEGER | PRIMARY KEY GENERATED ALWAYS AS IDENTITY | Identificador único do vínculo |
+| `player_id` | INTEGER | NOT NULL FK → `players(id)` ON DELETE CASCADE | Jogador que participa da temporada |
+| `temporada_id` | INTEGER | NOT NULL FK → `temporadas(id)` ON DELETE CASCADE | Temporada da qual o jogador participa |
+
+* `UNIQUE (player_id, temporada_id)` impede registrar o mesmo jogador duas vezes na mesma temporada.
+* Índice em `temporada_id` para acelerar consultas por temporada.
+
+### Entidade: `player_characters`
+
+Tabela de conexão (N:N) entre jogadores e personagens.
+
+| Campo | Tipo | Restrições | Descrição |
+|-------|------|-----------|-----------|
+| `id` | INTEGER | PRIMARY KEY GENERATED ALWAYS AS IDENTITY | Identificador único do vínculo |
+| `player_id` | INTEGER | NOT NULL FK → `players(id)` ON DELETE CASCADE | Jogador que usa o personagem |
+| `character_id` | INTEGER | NOT NULL FK → `characters(id)` ON DELETE CASCADE | Personagem usado pelo jogador |
+
+* `UNIQUE (player_id, character_id)` impede vínculos duplicados.
+* Índice em `character_id` para acelerar consultas por personagem.
+
+### Entidade: `character_rituals`
+
+Tabela de conexão (N:N) entre personagens e rituais.
+
+| Campo | Tipo | Restrições | Descrição |
+|-------|------|-----------|-----------|
+| `id` | INTEGER | PRIMARY KEY GENERATED ALWAYS AS IDENTITY | Identificador único do vínculo |
+| `character_id` | INTEGER | NOT NULL FK → `characters(id)` ON DELETE CASCADE | Personagem que conhece o ritual |
+| `ritual_id` | INTEGER | NOT NULL FK → `rituals(id)` ON DELETE CASCADE | Ritual conhecido pelo personagem |
+
+* `UNIQUE (character_id, ritual_id)` impede o mesmo ritual duplicado no mesmo personagem.
+* Índice em `ritual_id` para acelerar consultas por ritual.
+
+### Entidade: `character_items`
+
+Tabela de conexão (N:N) entre personagens e itens, com quantidade.
+
+| Campo | Tipo | Restrições | Descrição |
+|-------|------|-----------|-----------|
+| `id` | INTEGER | PRIMARY KEY GENERATED ALWAYS AS IDENTITY | Identificador único do vínculo |
+| `character_id` | INTEGER | NOT NULL FK → `characters(id)` ON DELETE CASCADE | Personagem que possui o item |
+| `item_id` | INTEGER | NOT NULL FK → `items(id)` ON DELETE CASCADE | Item possuído pelo personagem |
+| `quantity` | INTEGER | NOT NULL DEFAULT 1 CHECK (quantity > 0) | Quantidade de unidades do item que o personagem possui |
+
+* `UNIQUE (character_id, item_id)` garante uma única linha por par. Para ter mais unidades, aumente `quantity`.
+* Índice em `item_id` para acelerar consultas por item.
 ---
 
 ## 6. Diagramas
@@ -240,19 +355,100 @@ CHECK (VALUE ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$');
 
 ```mermaid
 erDiagram
-    TABELA1 {
-        int ID pk
-        username varchar(255) "Unique/Not Null"
-        email TEXT "Unique/Not Null/Dominio especifico"
-        passwdHash TEXT "Not Null"
+    users {
+        int id PK "Identity/Unique"
+        varchar(255) username "Unique/Not Null"
+        type_email email "Unique/Not Null/Domínio específico"
+        text passwd_hash "Not Null"
     }
-    
-    TABELA2 {
-        int id PK
-        int tabela1_id FK
+temporadas {
+    int id PK "Identity/Unique"
+    varchar(255) name "Unique/Not Null"
+    int ano_de_comeco "Not Null"
+    int ano_de_fim "Null / >= ano_de_comeco"
     }
-    
-    TABELA1 ||--o{ TABELA2 : "relacionamento"
+
+players {
+    int id PK "Identity/Unique"
+    varchar(255) name "Unique/Not Null"
+    }
+
+characters {
+    int id PK "Identity"
+    varchar(255) name "Not Null"
+    varchar(255) img "Null"
+    int agi "Not Null"
+    int str "Not Null"
+    int intel "Not Null"
+    int pre "Not Null"
+    int vig "Not Null"
+    varchar(255) occupation "Not Null"
+    text history "Not Null"
+    varchar(255) personality "Not Null"
+    varchar(12) class "Not Null"
+    int nex "Not Null"
+    }
+
+items {
+    int id PK "Identity"
+    varchar(255) name "Not Null"
+    varchar(255) img "Null"
+    varchar(255) type_item "Not Null"
+    varchar(255) damage "Not Null"
+    varchar(255) effect "Not Null"
+    varchar(255) item_range "Not Null"
+    int prestige "Not Null"
+    text description "Not Null"
+    }
+
+rituals {
+    int id PK "Identity"
+    varchar(255) name "Not Null"
+    varchar(255) img "Null"
+    varchar(255) element "Not Null"
+    int pd_gasto "Not Null"
+    varchar(255) ritual_type "Not Null"
+    varchar(255) dano "Null"
+    varchar(255) effect "Null"
+    text description "Not Null"
+    }
+
+player_temporadas {
+    int id PK
+    int player_id FK "Not Null"
+    int temporada_id FK "Not Null"
+    }
+
+player_characters {
+    int id PK
+    int player_id FK "Not Null"
+    int character_id FK "Not Null"
+    }
+
+character_rituals {
+    int id PK
+    int character_id FK "Not Null"
+    int ritual_id FK "Not Null"
+    }
+
+character_items {
+    int id PK
+    int character_id FK "Not Null"
+    int item_id FK "Not Null"
+    int quantity "Default 1 / > 0"
+    }
+
+players ||--o{ player_temporadas : "tem"
+temporadas ||--o{ player_temporadas : "inclui"
+
+players ||--o{ player_characters : "joga_com"
+characters ||--o{ player_characters : "usado_por"
+
+characters ||--o{ character_rituals : "conhece"
+rituals ||--o{ character_rituals : "usado_em"
+
+characters ||--o{ character_items : "possui"
+items ||--o{ character_items : "carregado_em"
 ```
 ### 6.2. Fluxo de [Processo]
 

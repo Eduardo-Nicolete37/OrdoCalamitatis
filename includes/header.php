@@ -12,6 +12,7 @@
                     <li><a href="/app/weapons.php">Armas</a></li>
                     <li><a href="/app/history.php">História</a></li>
                     <li><a href="/app/charlist.php">Personagens</a></li>
+                    <li><a href="/app/assests.php">Dossiês e Adicionais</a></li>
                 </ul>
             </details>
         </div>
