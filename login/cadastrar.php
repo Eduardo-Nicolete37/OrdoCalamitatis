@@ -1,4 +1,5 @@
-<?php require_once '../includes/helpers.php'; // Chamamos o helpers.php para podermos usar as funções que estão lá
+<?php 
+require_once '../includes/helpers.php'; // Chamamos o helpers.php para podermos usar as funções que estão lá
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -16,7 +17,7 @@
         include '../includes/header.php'; // Chamamos o header que está nos includes
         ?>
         <header>
-            <h1>Registre-se no sistema</h1>
+            <h1>Registre-se no sistema  - Ordo Calamitatis</h1>
         </header>
         <hr>
         <main>

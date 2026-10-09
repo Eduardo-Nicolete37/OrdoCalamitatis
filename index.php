@@ -11,7 +11,12 @@
     <header>
         <?php
         session_start();
-        include_once 'includes/header.php'; ?>
+        include_once __DIR__ . '/includes/header.php'; ?>
     </header>
+    <footer>
+        <?php 
+        include_once __DIR__ . '/includes/footer.php';
+        ?>
+    </footer>
 </body>
 </html>

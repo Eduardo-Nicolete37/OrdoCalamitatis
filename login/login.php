@@ -1,4 +1,5 @@
-<?php require_once '../includes/helpers.php'; // Chamamos o helpers.php para podermos usar as funções que estão lá
+<?php 
+require_once '../includes/helpers.php'; // Chamamos o helpers.php para podermos usar as funções que estão lá
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -7,7 +8,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../style/style.css">
-    <title>Ingresse</title>
+    <title>Ingresse  - Ordo Calamitatis</title>
 </head>
 
 <body>
