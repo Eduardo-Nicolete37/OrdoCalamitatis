@@ -1,8 +1,6 @@
 <?php
 require_once __DIR__ . "/../database/connect.php";
-// Funções relacionadas a criação de personagens
-// TODO: Fazer a function dod items e rituais
-// Cria o personagem e já vincula ao jogador
+// Funções relacionadas a criação de personagens (CREATE)
 function criaPersonagem(
     $conexao,
     $player_id,
@@ -58,6 +56,131 @@ function criaPersonagem(
         throw $e;
     }
 }
+
+function criaItem($conexao, $name, $foto, $type_item, $damage, $damage_type, $critical, $item_range, $effect, $category, $space, $prestige, $description) {
+    try {
+        $conexao->beginTransaction();
+
+        $sql = "INSERT INTO items (
+                    name,
+                    img,
+                    type_item,
+                    damage,
+                    damage_type,
+                    critical,
+                    item_range,
+                    effect,
+                    category,
+                    space,
+                    prestige,
+                    description
+                )
+                VALUES (
+                    :name,
+                    :img,
+                    :type_item,
+                    :damage,
+                    :damage_type,
+                    :critical,
+                    :item_range,
+                    :effect,
+                    :category,
+                    :space,
+                    :prestige,
+                    :description
+                )
+                RETURNING id";
+
+        $stmt = $conexao->prepare($sql);
+
+        $stmt->execute([
+            ':name'        => $name,
+            ':img'         => $foto,
+            ':type_item'   => $type_item,
+            ':damage'      => $damage !== '' ? $damage : null,
+            ':damage_type' => $damage_type !== '' ? $damage_type : null,
+            ':critical'    => $critical !== '' ? $critical : null,
+            ':item_range'  => $item_range !== '' ? $item_range : null,
+            ':effect'      => $effect !== '' ? $effect : null,
+            ':category'    => $category !== '' ? $category : null,
+            ':space'       => $space,
+            ':prestige'    => $prestige,
+            ':description' => $description
+        ]);
+
+        $item_id = $stmt->fetchColumn();
+
+        $conexao->commit();
+
+        return $item_id;
+
+    } catch (Throwable $e) {
+        if ($conexao->inTransaction()) {
+            $conexao->rollBack();
+        }
+
+        throw $e;
+    }
+}
+function criaRitual($conexao, $name, $pathImage, $element, $ritual_type, $pd_gasto, $dano, $effect, $description) {
+    try {
+        $conexao->beginTransaction();
+
+        $sql = "INSERT INTO rituals (
+                    name,
+                    img,
+                    element,
+                    pd_gasto,
+                    ritual_type,
+                    dano,
+                    effect,
+                    description
+                )
+                VALUES (
+                    :name,
+                    :img,
+                    :element,
+                    :pd_gasto,
+                    :ritual_type,
+                    :dano,
+                    :effect,
+                    :description
+                )
+                RETURNING id";
+
+        $stmt = $conexao->prepare($sql);
+
+        $stmt->execute([
+            ':name'        => $name,
+            ':img'         => $pathImage,
+            ':element'   => $element,
+            ':pd_gasto'      => $pd_gasto,
+            ':ritual_type' => $ritual_type,
+            ':dano'    => $dano,
+            ':effect' => $effect,
+            ':description' => $description
+        ]);
+
+        $ritual_id = $stmt->fetchColumn();
+
+        $conexao->commit();
+
+        return $ritual_id;
+    } catch (Throwable $e) {
+        if ($conexao->inTransaction()) {
+            $conexao->rollBack();
+        }
+
+        throw $e;
+    }
+}
+// Funções ligadas a leitura do Banco de Dados (READ) 
+function readPersonagens($conexao, $id_user) {
+
+    $sql = "SELECT id, name, img FROM characters WHERE ORDER BY id"; // Definimos a função que será enviada ao SQL
+
+}
+
 // Funções relacionadas ao Login
 function consultaUser($conexao, $email)
 {

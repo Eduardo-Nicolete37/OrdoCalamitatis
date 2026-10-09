@@ -1,8 +1,8 @@
 <head>
-    <!--<link rel="stylesheet" href="style.css">-->
+    <link rel="stylesheet" href="/OrdoCalamitatis/style/style.css">
     <link href="https://googleapis.com" rel="stylesheet">
 </head>
-<nav>
+<nav aria-label="Menu principal">
     <div class="navConfig">
         <div class="menuButton">
             <details>
@@ -17,8 +17,8 @@
             </details>
         </div>
         <div>
-            <a href="/" class="logo-navbar">
-                <img src=".\images\logo.webp" alt="logo"> <!--Placeholder por agora-->
+            <a href="/OrdoCalamitatis/" class="logo-navbar">
+                <img src="/OrdoCalamitatis/" alt="logo"> <!--Placeholder por agora-->
             </a>
         </div>
         <?php 
@@ -27,18 +27,18 @@ if (isset($_SESSION['id'])){
     echo "<details>";
     echo "<summary>Administrador - " . $_SESSION['username'] . "</summary>";
     echo "<ul>";
-    echo "<li><a href='/app/adm/new_char.php'>Novo Personagem</a></li>";
-    echo "<li><a href='/app/adm/creations.php'>Suas Criações</a></li>";
-    echo "<li><a href='/app/adm/new_item.php'>Novo Item</a></li>";
-    echo "<li><a href='/app/adm/new_ritual.php'>Novo Ritual</a></li>";
-    echo "<li><a href='/login/logout.php'>Log-Out</a></li>";
+    echo "<li><a href='/OrdoCalamitatis/app/adm/new_char.php'>Novo Personagem</a></li>";
+    echo "<li><a href='/OrdoCalamitatis/app/adm/new_item.php'>Novo Item</a></li>";
+    echo "<li><a href='/OrdoCalamitatis/app/adm/new_ritual.php'>Novo Ritual</a></li>";
+    echo "<li><a href='/OrdoCalamitatis/app/adm/creations.php'>Suas Criações</a></li>";
+    echo "<li><a href='/OrdoCalamitatis/login/logout.php'>Log-Out</a></li>";
     echo "</ul>";
     echo "</details>";
     echo "</div>";
 } else {
     echo "<div class='authLinks'>";
-    echo "<a href='/login/cadastrar.php'>Cadastre-se</a>";
-    echo "<a href='/login/login.php'>Entre aqui</a>";
+    echo "<a href='/OrdoCalamitatis/login/cadastrar.php'>Cadastre-se</a>";
+    echo "<a href='/OrdoCalamitatis/login/login.php'>Entre aqui</a>";
     echo "</div>";
 }
 ?>

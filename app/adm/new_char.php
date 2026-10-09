@@ -4,6 +4,12 @@ require_once __DIR__ . '/../../includes/helpers.php';
 
 $erro = null;
 
+$grupos_tracos = [
+    'Racionais'  => ['Cético', 'Metódico', 'Frio e Calculista'],
+    'Impulsivos' => ['Protetor', 'Impulsivo', 'Vingativo'],
+    'Instáveis'  => ['Paranoico', 'Empático', 'Excêntrico'],
+];
+
 $lista_pericias = [
     'Acrobacia',
     'Adestramento',
@@ -45,6 +51,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             throw new Exception("Jogador inválido.");
         }
 
+        // O trim serve para 2 funções principais:
+        //  1. Remover espaços inúteis no começo e/ou fim do input
+        //  2. Para evitar o recebimento de mensagens somente com espaços, como '     '. O trim faz com que a string fique vazia, retornando a mensagem que o campo é obrigatório
+        // O ?? serve para usar o $_POST somente caso ele exista, senão enviar um espaço vazio, que vai retornar erro
         $name       = trim($_POST['name'] ?? '');
         $agi        = (int) ($_POST['agi'] ?? 0);
         $str        = (int) ($_POST['str'] ?? 0);
@@ -63,7 +73,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         // Traços: filtra pelo permitido e junta em uma string
-        $tracos_validos = ['Cético', 'Metódico', 'Frio e Calculista', 'Protetor', 'Impulsivo', 'Vingativo', 'Paranoico', 'Empático', 'Excêntrico'];
+        $tracos_validos = array_merge(...array_values($grupos_tracos));
         $tracos = array_intersect($_POST['tracos'] ?? [], $tracos_validos);
         if (empty($tracos)) {
             throw new Exception("Selecione ao menos um traço de personalidade.");
@@ -78,7 +88,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         criaPersonagem($conexao, $player_id, $name, $pathImage, $agi, $str, $intel, $pre, $vig, $history, $occupation, $personality, $class, $nex, $pericias);
 
-        header('Location: /app/user/personagens.php'); // ajuste para a sua página de destino
+        header('Location: /OrdoCalamitatis/app/adm/creations.php');
         exit;
     } catch (Exception $e) {
         // Apaga a imagem enviada se algo falhou depois do upload
@@ -99,15 +109,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/style/style.css">
-    <title>Novo Personagem</title>
+    <link rel="stylesheet" href="./../../style/style.css">
+    <title>Novo Personagem - Ordo Calamitatis</title>
 </head>
 
 <body>
     <header>
-    <?php
-    include_once __DIR__ . "/../../includes/header.php";
-    ?>
+        <?php
+        include_once __DIR__ . "/../../includes/header.php";
+        ?>
         <h1>Novo Personagem</h1>
     </header>
     <main>
@@ -166,24 +176,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <option value="T.I. (Tecnologia da Informação)"></option>
             </datalist>
 
-            <label for="tracos-personalidade">Traços de Personalidade (Segure Ctrl ou Cmd para marcar vários):</label>
-            <select id="tracos-personalidade" name="tracos[]" multiple size="9" required>
-                <optgroup label="Racionais">
-                    <option value="Cético">Cético</option>
-                    <option value="Metódico">Metódico</option>
-                    <option value="Frio e Calculista">Frio e Calculista</option>
-                </optgroup>
-                <optgroup label="Impulsivos">
-                    <option value="Protetor">Protetor</option>
-                    <option value="Impulsivo">Impulsivo</option>
-                    <option value="Vingativo">Vingativo</option>
-                </optgroup>
-                <optgroup label="Instáveis">
-                    <option value="Paranoico">Paranoico</option>
-                    <option value="Empático">Empático</option>
-                    <option value="Excêntrico">Excêntrico</option>
-                </optgroup>
-            </select>
+            <fieldset>
+                <legend>Traços de Personalidade:</legend>
+                <?php foreach ($grupos_tracos as $grupo => $tracos_do_grupo): ?>
+                    <div class="grupo-tracos">
+                        <span class="grupo-titulo"><?= htmlspecialchars($grupo) ?></span>
+                        <?php foreach ($tracos_do_grupo as $t): ?>
+                            <label>
+                                <input type="checkbox" name="tracos[]" value="<?= htmlspecialchars($t) ?>">
+                                <?= htmlspecialchars($t) ?>
+                            </label>
+                        <?php endforeach; ?>
+                    </div>
+                <?php endforeach; ?>
+            </fieldset>
 
             <fieldset>
                 <legend>Perícias treinadas:</legend>
@@ -204,6 +210,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <input type="submit" value="Enviar">
         </form>
     </main>
+    <footer>
+        <?php 
+        include_once  __DIR__ . '/../../includes/footer.php';
+        ?>
+    </footer>
 </body>
 
 </html>
