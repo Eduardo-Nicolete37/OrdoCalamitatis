@@ -340,6 +340,21 @@ fieldset label {
     cursor: pointer;
 }
 
+.grupo-tracos {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.grupo-titulo {
+    color: var(--text);
+    font-family: var(--font-title);
+    font-weight: bold;
+    text-align: left;
+    padding-bottom: 4px;
+    border-bottom: 1px solid var(--border);
+}
+
 input[type="checkbox"],
 input[type="radio"] {
     accent-color: var(--wine-light);
