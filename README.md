@@ -204,7 +204,7 @@ OrdoCalamitatis
 | **RF02** | Cadastro de Usuários | O sistema deve permitir novo registro com validação de email único | Alta | ✅ |
 | **RF03** | Proteção de Rotas | Páginas de usuário devem redirecionar para login se não autenticado | Alta | ✅ |
 | **RF04** | Logout Seguro | Destruir sessão e limpar dados de autenticação | Alta | ✅ |
-| **RF05** | Criar Criações | O sistema deve fornecer formulários separados para Personagem, Item e Ritual | Alta | ⬜ |
+| **RF05** | Criar Criações | O sistema deve fornecer formulários separados para Personagem, Item e Ritual | Alta | ✅ |
 | **RF06** | Listar Criações | O sistema deve exibir todas as criações do usuário | Alta | ⬜ |
 | **RF07** | Editar Criações | O sistema deve permitir atualização de qualquer criação do próprio e somente do usuário | Alta | ⬜ |
 | **RF08** | Remover Criações | O sistema deve remover criações com confirmação de segurança | Alta | ⬜ |
@@ -226,7 +226,7 @@ OrdoCalamitatis
 | **RNF04** | Proteção SQL Injection | Todos os queries devem usar prepared statements | Alta | ✅ |
 | **RNF05** | Criptografia de Senha | Usar password_hash() com PASSWORD_DEFAULT | Alta | ✅ |
 | **RNF06** | Sessões Seguras | Usar $_SESSION com controle de acesso por user_id | Alta | ✅ |
-| **RNF07** | Upload de Imagem | Restringir a JPG/PNG, máx 2MB, renomear com hash | Média | ⬜ |
+| **RNF07** | Upload de Imagem | Restringir a JPG/PNG, máx 2MB, renomear com hash | Média | ✅ |
 | **RNF08** | Design Consistente | Variáveis CSS e tema escuro (#1A1A1E) | Média | ✅ |
 
 ### 4.3. Regras de Negócio
