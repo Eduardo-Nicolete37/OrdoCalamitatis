@@ -138,31 +138,57 @@ OrdoCalamitatis
 │   .gitignore
 │   index.php
 │   README.md
+│
 ├───app
-│       char.php
-│       charlist.php
-│       history.php
-│       new_char.php
-│       new_item.php
-│       new_ritual.php
-│       rituals.php
-│       weapons.php
+│   ├───adm
+│   │       creations.php
+│   │       new_char.php
+│   │       new_item.php
+│   │       new_ritual.php
+│   │
+│   └───user
+│           assests.php
+│           charlist.php
+│           history.php
+│           rituals.php
+│           weapons.php
+│
 ├───database
 │       connect.php
+│
 ├───documentation
+│       BaixaFidelidade.excalidraw
 │       BCD_modelation.md
 │       comandosFeitosParaCriacaoDosBancos.pgsql
+│       dumpCalamitatisDB.sql
+│
 ├───includes
 │       footer.php
 │       header.php
 │       helpers.php
+│
 ├───login
 │       cadastrar.php
 │       login.php
 │       logout.php
 │       verifica_user.php
-└───style
-        style.css
+│
+├───pdfs
+│       ArquivosSecretos01.pdf
+│       ArquivosSecretos02.pdf
+│       ArquivosSecretos03.pdf
+│       ArquivosSecretos04.pdf
+│       ArquivosSecretos05.pdf
+│       ArquivosSecretos06.pdf
+│       ArquivosSecretos07.pdf
+│       FichaDosAgentesEditavel.pdf
+│       ordem-paranormal-regras-book.pdf
+│       OrdemParanormal2Playtest.pdf
+│
+├───style
+│       style.css
+│
+└───uploads
 ```
 
 ---
@@ -220,6 +246,8 @@ OrdoCalamitatis
 
 ### Entidade: `userTabela`
 
+Conta de login do sistema. Não se confunde com `players`, que representa o jogador "de mesa" dono do personagem.
+
 | Campo | Tipo | Restrições | Descrição |
 |-------|------|-----------|-----------|
 | `id` | INTEGER | PRIMARY KEY GENERATED ALWAYS AS IDENTITY | Identificador único do usuário |
@@ -244,6 +272,8 @@ CHECK (VALUE ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$');
 
 ### Entidade: `players`
 
+Jogador "de mesa", ou seja, a pessoa real que é dona de um ou mais personagens. Não tem ligação com `userTabela`.
+
 | Campo | Tipo | Restrições | Descrição |
 |-------|------|-----------|-----------|
 | `id` | INTEGER | PRIMARY KEY GENERATED ALWAYS AS IDENTITY | Identificador único do jogador |
@@ -255,17 +285,17 @@ CHECK (VALUE ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$');
 |-------|------|-----------|-----------|
 | `id` | INTEGER | PRIMARY KEY GENERATED ALWAYS AS IDENTITY | Identificador único do personagem |
 | `name` | VARCHAR(255) | NOT NULL | Nome do personagem (pode repetir entre personagens) |
-| `img` | VARCHAR(255) | | Caminho ou URL da imagem do personagem |
-| `agi` | INTEGER | NOT NULL | Atributo Agilidade |
-| `str` | INTEGER | NOT NULL | Atributo Força |
-| `intel` | INTEGER | NOT NULL | Atributo Intelecto (renomeado de `int` para não conflitar com o tipo SQL) |
-| `pre` | INTEGER | NOT NULL | Atributo Presença |
-| `vig` | INTEGER | NOT NULL | Atributo Vigor |
-| `occupation` | VARCHAR(255) | NOT NULL | Ocupação ou profissão do personagem |
+| `img` | VARCHAR(255) | | Caminho relativo da imagem do personagem (ex.: `uploads/img_123.jpg`) |
+| `agi` | INTEGER | NOT NULL CHECK (agi >= 0) | Atributo Agilidade |
+| `str` | INTEGER | NOT NULL CHECK (str >= 0) | Atributo Força |
+| `intel` | INTEGER | NOT NULL CHECK (intel >= 0) | Atributo Intelecto (renomeado de `int` para não conflitar com o tipo SQL) |
+| `pre` | INTEGER | NOT NULL CHECK (pre >= 0) | Atributo Presença |
+| `vig` | INTEGER | NOT NULL CHECK (vig >= 0) | Atributo Vigor |
+| `occupation` | VARCHAR(255) | NOT NULL | Origem (passado) do personagem, escolhida na lista ou digitada |
 | `history` | TEXT | NOT NULL | História de fundo do personagem (TEXT porque costuma passar de 255 caracteres) |
-| `personality` | VARCHAR(255) | NOT NULL | Traços de personalidade do personagem |
-| `class` | VARCHAR(12) | NOT NULL | Classe do personagem (ex.: Combatente, Especialista, Ocultista) |
-| `nex` | INTEGER | NOT NULL | Nível de exposição (NEX) do personagem |
+| `personality` | VARCHAR(255) | NOT NULL | Traços de personalidade do personagem, separados por vírgula (ex.: `Cético, Protetor`) |
+| `class` | VARCHAR(12) | NOT NULL CHECK (class IN ('Combatente', 'Especialista', 'Ocultista')) | Classe do personagem |
+| `nex` | INTEGER | NOT NULL CHECK (nex BETWEEN 0 AND 99) | Nível de exposição (NEX) do personagem |
 
 ### Entidade: `items`
 
@@ -273,13 +303,17 @@ CHECK (VALUE ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$');
 |-------|------|-----------|-----------|
 | `id` | INTEGER | PRIMARY KEY GENERATED ALWAYS AS IDENTITY | Identificador único do item |
 | `name` | VARCHAR(255) | NOT NULL | Nome do item |
-| `img` | VARCHAR(255) | | Caminho ou URL da imagem do item |
-| `type_item` | VARCHAR(255) | NOT NULL | Categoria do item (ex.: arma, proteção, utensílio) |
-| `damage` | VARCHAR(255) | NOT NULL | Dano causado pelo item, em texto livre (ex.: "1d6") |
-| `effect` | VARCHAR(255) | NOT NULL | Efeito resumido do item |
-| `item_range` | VARCHAR(255) | NOT NULL | Alcance do item (renomeado de `range` para evitar conflito com palavra do SQL) |
-| `prestige` | INTEGER | NOT NULL | Valor de prestígio do item |
+| `img` | VARCHAR(255) | | Caminho relativo da imagem do item |
+| `type_item` | VARCHAR(255) | NOT NULL | Tipo do item (ex.: Arma, Proteção, Geral, Paranormal) |
+| `damage` | VARCHAR(255) | | Dano causado pelo item, em texto livre (ex.: "1d6"). `NULL` se não for arma |
+| `effect` | VARCHAR(255) | | Efeito resumido do item. `NULL` se não houver |
+| `item_range` | VARCHAR(255) | | Alcance do item (renomeado de `range` para evitar conflito com palavra do SQL). `NULL` se não for arma |
+| `prestige` | INTEGER | NOT NULL DEFAULT 0 | Valor de prestígio do item |
 | `description` | TEXT | NOT NULL | Descrição completa do item |
+| `category` | VARCHAR(3) | | Categoria do item (0, I, II, III ou IV) |
+| `space` | INTEGER | NOT NULL DEFAULT 1 CHECK (space >= 0) | Espaços que o item ocupa no inventário |
+| `critical` | VARCHAR(10) | | Margem de ameaça e multiplicador do crítico (ex.: `19/x2`) |
+| `damage_type` | VARCHAR(20) | | Tipo de dano (ex.: Corte, Impacto, Perfuração, Balístico) |
 
 ### Entidade: `rituals`
 
@@ -287,10 +321,10 @@ CHECK (VALUE ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$');
 |-------|------|-----------|-----------|
 | `id` | INTEGER | PRIMARY KEY GENERATED ALWAYS AS IDENTITY | Identificador único do ritual |
 | `name` | VARCHAR(255) | NOT NULL | Nome do ritual |
-| `img` | VARCHAR(255) | | Caminho ou URL da imagem do ritual |
+| `img` | VARCHAR(255) | | Caminho relativo da imagem do ritual |
 | `element` | VARCHAR(255) | NOT NULL | Elemento ao qual o ritual pertence |
 | `pd_gasto` | INTEGER | NOT NULL | Custo em PD para conjurar o ritual |
-| `ritual_type` | VARCHAR(255) | NOT NULL | Tipo do ritual (renomeado de `type` para evitar confusão com palavra do SQL) |
+| `ritual_type` | VARCHAR(255) | NOT NULL | Tipo do ritual, como o círculo (renomeado de `type` para evitar confusão com palavra do SQL) |
 | `dano` | VARCHAR(255) | | Dano causado pelo ritual, em texto livre. `NULL` se não causar dano |
 | `effect` | VARCHAR(255) | | Efeito resumido do ritual. `NULL` se não houver |
 | `description` | TEXT | NOT NULL | Descrição completa do ritual |
@@ -347,6 +381,19 @@ Tabela de conexão (N:N) entre personagens e itens, com quantidade.
 
 * `UNIQUE (character_id, item_id)` garante uma única linha por par. Para ter mais unidades, aumente `quantity`.
 * Índice em `item_id` para acelerar consultas por item.
+
+### Entidade: `character_skills`
+
+Tabela de conexão entre personagens e as perícias em que eles são treinados. Cada linha é uma perícia treinada.
+
+| Campo | Tipo | Restrições | Descrição |
+|-------|------|-----------|-----------|
+| `id` | INTEGER | PRIMARY KEY GENERATED ALWAYS AS IDENTITY | Identificador único do vínculo |
+| `character_id` | INTEGER | NOT NULL FK → `characters(id)` ON DELETE CASCADE | Personagem treinado na perícia |
+| `skill` | VARCHAR(30) | NOT NULL | Nome da perícia (ex.: Atletismo, Investigação), validado pela lista do formulário |
+
+* `UNIQUE (character_id, skill)` impede a mesma perícia duplicada no mesmo personagem.
+* Não precisa de índice extra em `character_id`, porque o índice do `UNIQUE` já começa por essa coluna.
 ---
 
 ## 6. Diagramas
