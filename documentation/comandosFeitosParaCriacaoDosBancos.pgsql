@@ -5,7 +5,7 @@ CHECK (VALUE ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$');
 -- Por fim, o trecho "\.[A-Za-z]{2,}$')" define que tem que ter um ., se colocasse-mos só um ., significaria que qualquer coisa poderia ser colocada nesse local, e depois, pode ir qualquer coisa, porém, tem que ter mais de 1 caractere
 
 CREATE TABLE userTabela (
-    id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY, -- Foi usado INTEGER pois é uma versão mais atualizada do SERIAL, tendo problemas de segurança como permitir sobrescrever o id, não segue o padrão SQL, etc
+    id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY, -- Foi usado IDENTITY no lugar do SERIAL pois ele segue o padrão SQL e não permite sobrescrever o id manualmente (o SERIAL permite, não segue o padrão SQL, etc)
     username VARCHAR(255) UNIQUE NOT NULL,
     email typeEmail UNIQUE NOT NULL,
     passwd TEXT NOT NULL);
@@ -27,16 +27,16 @@ CREATE TABLE characters (
     id          INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     name        VARCHAR(255) NOT NULL,
     img         VARCHAR(255),
-    agi         INTEGER NOT NULL,
-    str         INTEGER NOT NULL,
-    intel       INTEGER NOT NULL,   
-    pre         INTEGER NOT NULL,
-    vig         INTEGER NOT NULL,
+    agi         INTEGER NOT NULL CHECK (agi >= 0),
+    str         INTEGER NOT NULL CHECK (str >= 0),
+    intel       INTEGER NOT NULL CHECK (intel >= 0),
+    pre         INTEGER NOT NULL CHECK (pre >= 0),
+    vig         INTEGER NOT NULL CHECK (vig >= 0),
     occupation  VARCHAR(255) NOT NULL,
     history     TEXT NOT NULL,      
     personality VARCHAR(255) NOT NULL,  
-    class       VARCHAR(12) NOT NULL,
-    nex         INTEGER NOT NULL
+    class       VARCHAR(12) NOT NULL CHECK (class IN ('Combatente', 'Especialista', 'Ocultista')),
+    nex         INTEGER NOT NULL CHECK (nex BETWEEN 0 AND 99)
 );
 
 CREATE TABLE items (
@@ -44,11 +44,15 @@ CREATE TABLE items (
     name         VARCHAR(255) NOT NULL,
     img          VARCHAR(255),
     type_item    VARCHAR(255) NOT NULL,
-    damage       VARCHAR(255) NOT NULL,
-    effect       VARCHAR(255) NOT NULL,
-    item_range   VARCHAR(255) NOT NULL, 
-    prestige     INTEGER NOT NULL,
-    description  TEXT NOT NULL
+    damage       VARCHAR(255), -- Só armas têm dano, efeito e alcance, por isso aceitam NULL
+    effect       VARCHAR(255),
+    item_range   VARCHAR(255), 
+    prestige     INTEGER NOT NULL DEFAULT 0,
+    description  TEXT NOT NULL,
+    category     VARCHAR(3),
+    space        INTEGER NOT NULL DEFAULT 1 CHECK (space >= 0),
+    critical     VARCHAR(10),
+    damage_type  VARCHAR(20)
 );
 
 CREATE TABLE rituals (
@@ -91,6 +95,13 @@ CREATE TABLE character_items (
     item_id      INTEGER NOT NULL REFERENCES items(id) ON DELETE CASCADE,
     quantity     INTEGER NOT NULL DEFAULT 1 CHECK (quantity > 0),
     UNIQUE (character_id, item_id)
+);
+
+CREATE TABLE character_skills (
+    id           INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    character_id INTEGER NOT NULL REFERENCES characters(id) ON DELETE CASCADE,
+    skill        VARCHAR(30) NOT NULL,
+    UNIQUE (character_id, skill)
 );
 
 -- Índices nas FKs (o Postgres não cria automaticamente)
