@@ -92,7 +92,7 @@ CREATE DATABASE calamitatisdb;
 ```
 4. Crie um usuário do Postgres específico para gerenciar este Banco de Dados, ainda com o Postgres aberto, escreva os comandos:
 ```sql
-CREATE USER ordo WITH PASSWORD "*sua_senha*";
+CREATE USER ordo WITH PASSWORD '*sua_senha*';
 ALTER DATABASE calamitatisdb OWNER TO ordo;
 \q
 ```
@@ -205,14 +205,13 @@ OrdoCalamitatis
 | **RF03** | Proteção de Rotas | Páginas de usuário devem redirecionar para login se não autenticado | Alta | ✅ |
 | **RF04** | Logout Seguro | Destruir sessão e limpar dados de autenticação | Alta | ✅ |
 | **RF05** | Criar Criações | O sistema deve fornecer formulários separados para Personagem, Item e Ritual | Alta | ✅ |
-| **RF06** | Listar Criações | O sistema deve exibir todas as criações do usuário | Alta | ⬜ |
+| **RF06** | Listar Criações | O sistema deve exibir todas as criações do usuário | Alta | ✅ |
 | **RF07** | Editar Criações | O sistema deve permitir atualização de qualquer criação do próprio e somente do usuário | Alta | ⬜ |
 | **RF08** | Remover Criações | O sistema deve remover criações com confirmação de segurança | Alta | ⬜ |
 | **RF09** | Ver Detalhes | O sistema deve exibir informações completas de cada criação | Média | ⬜ |
-| **RF10** | Associar Item a Personagem | O sistema deve permitir que personagens possuam itens | Média | ⬜ |
+| **RF10** | Associar Item a Personagem | O sistema deve permitir que personagens possuam itens | Média | ✅ |
 | **RF11** | Associar Ritual a Personagem | O sistema deve permitir que personagens dominem rituais | Média | ⬜ |
-| **RF12** | Associar Criação a Temporada | O sistema deve ligar criações a temporadas específicas | Média | ⬜ |
-| **RF13** | Disponibilizar Livros de Referência | O sistema deve disponibilizar, em uma página separada, os livros do Mestre e do Player anexados ao projeto para consulta dos usuários. | Baixa | ✅ |
+| **RF12** | Disponibilizar Livros de Referência | O sistema deve disponibilizar, em uma página separada, os livros do Mestre e do Player anexados ao projeto para consulta dos usuários. | Baixa | ✅ |
 
 
 ### 4.2. Requisitos Não-Funcionais
@@ -226,7 +225,7 @@ OrdoCalamitatis
 | **RNF04** | Proteção SQL Injection | Todos os queries devem usar prepared statements | Alta | ✅ |
 | **RNF05** | Criptografia de Senha | Usar password_hash() com PASSWORD_DEFAULT | Alta | ✅ |
 | **RNF06** | Sessões Seguras | Usar $_SESSION com controle de acesso por user_id | Alta | ✅ |
-| **RNF07** | Upload de Imagem | Restringir a JPG/PNG, máx 2MB, renomear com hash | Média | ✅ |
+| **RNF07** | Upload de Imagem | Verificar se realmente é uma imagem, máx 2MB, renomear com hash | Média | ✅ |
 | **RNF08** | Design Consistente | Variáveis CSS e tema escuro (#1A1A1E) | Média | ✅ |
 
 ### 4.3. Regras de Negócio
@@ -241,12 +240,11 @@ OrdoCalamitatis
 | **RN06** | Sem Duplicação M:M | Um personagem não pode ter o mesmo item 2x |
 
 ---
-
 ## 5. Estrutura do Banco de Dados
 
 ### Entidade: `userTabela`
 
-Conta de login do sistema. Não se confunde com `players`, que representa o jogador "de mesa" dono do personagem.
+Conta de login do sistema. Não se confunde com `players`, que representa o jogador "de mesa" dono do personagem. É também a conta que aparece como criadora (`created_by`) de personagens, itens e rituais.
 
 | Campo | Tipo | Restrições | Descrição |
 |-------|------|-----------|-----------|
@@ -285,7 +283,7 @@ Jogador "de mesa", ou seja, a pessoa real que é dona de um ou mais personagens.
 |-------|------|-----------|-----------|
 | `id` | INTEGER | PRIMARY KEY GENERATED ALWAYS AS IDENTITY | Identificador único do personagem |
 | `name` | VARCHAR(255) | NOT NULL | Nome do personagem (pode repetir entre personagens) |
-| `img` | VARCHAR(255) | | Caminho relativo da imagem do personagem (ex.: `uploads/img_123.jpg`) |
+| `img` | VARCHAR(255) | NOT NULL | Caminho relativo da imagem do personagem (ex.: `uploads/img_123.jpg`) |
 | `agi` | INTEGER | NOT NULL CHECK (agi >= 0) | Atributo Agilidade |
 | `str` | INTEGER | NOT NULL CHECK (str >= 0) | Atributo Força |
 | `intel` | INTEGER | NOT NULL CHECK (intel >= 0) | Atributo Intelecto (renomeado de `int` para não conflitar com o tipo SQL) |
@@ -296,6 +294,10 @@ Jogador "de mesa", ou seja, a pessoa real que é dona de um ou mais personagens.
 | `personality` | VARCHAR(255) | NOT NULL | Traços de personalidade do personagem, separados por vírgula (ex.: `Cético, Protetor`) |
 | `class` | VARCHAR(12) | NOT NULL CHECK (class IN ('Combatente', 'Especialista', 'Ocultista')) | Classe do personagem |
 | `nex` | INTEGER | NOT NULL CHECK (nex BETWEEN 0 AND 99) | Nível de exposição (NEX) do personagem |
+| `created_by` | INTEGER | FK → `userTabela(id)` ON DELETE SET NULL | Conta que criou o personagem. `NULL` em registros antigos ou se a conta for apagada |
+
+* Índice em `created_by` para acelerar a listagem das criações de cada usuário.
+* O dono do personagem (o jogador "de mesa") não fica nesta tabela: é registrado em `player_characters`.
 
 ### Entidade: `items`
 
@@ -303,7 +305,7 @@ Jogador "de mesa", ou seja, a pessoa real que é dona de um ou mais personagens.
 |-------|------|-----------|-----------|
 | `id` | INTEGER | PRIMARY KEY GENERATED ALWAYS AS IDENTITY | Identificador único do item |
 | `name` | VARCHAR(255) | NOT NULL | Nome do item |
-| `img` | VARCHAR(255) | | Caminho relativo da imagem do item |
+| `img` | VARCHAR(255) | NOT NULL | Caminho relativo da imagem do item |
 | `type_item` | VARCHAR(255) | NOT NULL | Tipo do item (ex.: Arma, Proteção, Geral, Paranormal) |
 | `damage` | VARCHAR(255) | | Dano causado pelo item, em texto livre (ex.: "1d6"). `NULL` se não for arma |
 | `effect` | VARCHAR(255) | | Efeito resumido do item. `NULL` se não houver |
@@ -314,6 +316,10 @@ Jogador "de mesa", ou seja, a pessoa real que é dona de um ou mais personagens.
 | `space` | INTEGER | NOT NULL DEFAULT 1 CHECK (space >= 0) | Espaços que o item ocupa no inventário |
 | `critical` | VARCHAR(10) | | Margem de ameaça e multiplicador do crítico (ex.: `19/x2`) |
 | `damage_type` | VARCHAR(20) | | Tipo de dano (ex.: Corte, Impacto, Perfuração, Balístico) |
+| `created_by` | INTEGER | FK → `userTabela(id)` ON DELETE SET NULL | Conta que criou o item. `NULL` em registros antigos ou se a conta for apagada |
+
+* Índice em `created_by` para acelerar a listagem das criações de cada usuário.
+* O personagem que possui o item é registrado em `character_items`.
 
 ### Entidade: `rituals`
 
@@ -321,13 +327,17 @@ Jogador "de mesa", ou seja, a pessoa real que é dona de um ou mais personagens.
 |-------|------|-----------|-----------|
 | `id` | INTEGER | PRIMARY KEY GENERATED ALWAYS AS IDENTITY | Identificador único do ritual |
 | `name` | VARCHAR(255) | NOT NULL | Nome do ritual |
-| `img` | VARCHAR(255) | | Caminho relativo da imagem do ritual |
+| `img` | VARCHAR(255) | NOT NULL | Caminho relativo da imagem do ritual |
 | `element` | VARCHAR(255) | NOT NULL | Elemento ao qual o ritual pertence |
 | `pd_gasto` | INTEGER | NOT NULL | Custo em PD para conjurar o ritual |
 | `ritual_type` | VARCHAR(255) | NOT NULL | Tipo do ritual, como o círculo (renomeado de `type` para evitar confusão com palavra do SQL) |
 | `dano` | VARCHAR(255) | | Dano causado pelo ritual, em texto livre. `NULL` se não causar dano |
 | `effect` | VARCHAR(255) | | Efeito resumido do ritual. `NULL` se não houver |
 | `description` | TEXT | NOT NULL | Descrição completa do ritual |
+| `created_by` | INTEGER | FK → `userTabela(id)` ON DELETE SET NULL | Conta que criou o ritual. `NULL` em registros antigos ou se a conta for apagada |
+
+* Índice em `created_by` para acelerar a listagem das criações de cada usuário.
+* O personagem que conhece o ritual é registrado em `character_rituals`.
 
 ### Entidade: `player_temporadas`
 
@@ -402,102 +412,107 @@ Tabela de conexão entre personagens e as perícias em que eles são treinados. 
 
 ```mermaid
 erDiagram
-    users {
+    userTabela {
         int id PK "Identity/Unique"
         varchar(255) username "Unique/Not Null"
-        type_email email "Unique/Not Null/Domínio específico"
-        text passwd_hash "Not Null"
+        typeEmail email "Unique/Not Null/Domínio específico"
+        text passwd "Not Null"
     }
-temporadas {
-    int id PK "Identity/Unique"
-    varchar(255) name "Unique/Not Null"
-    int ano_de_comeco "Not Null"
-    int ano_de_fim "Null / >= ano_de_comeco"
+    temporadas {
+        int id PK "Identity/Unique"
+        varchar(255) name "Unique/Not Null"
+        int ano_de_comeco "Not Null"
+        int ano_de_fim "Null / >= ano_de_comeco"
+    }
+    players {
+        int id PK "Identity/Unique"
+        varchar(255) name "Unique/Not Null"
+    }
+    characters {
+        int id PK "Identity"
+        varchar(255) name "Not Null"
+        varchar(255) img "Not Null"
+        int agi "Not Null / >= 0"
+        int str "Not Null / >= 0"
+        int intel "Not Null / >= 0"
+        int pre "Not Null / >= 0"
+        int vig "Not Null / >= 0"
+        varchar(255) occupation "Not Null"
+        text history "Not Null"
+        varchar(255) personality "Not Null"
+        varchar(12) class "Not Null / 3 classes"
+        int nex "Not Null / 0 a 99"
+        int created_by FK "Null"
+    }
+    items {
+        int id PK "Identity"
+        varchar(255) name "Not Null"
+        varchar(255) img "Not Null"
+        varchar(255) type_item "Not Null"
+        varchar(255) damage "Null"
+        varchar(255) effect "Null"
+        varchar(255) item_range "Null"
+        int prestige "Default 0"
+        text description "Not Null"
+        varchar(3) category "Null"
+        int space "Default 1 / >= 0"
+        varchar(10) critical "Null"
+        varchar(20) damage_type "Null"
+        int created_by FK "Null"
+    }
+    rituals {
+        int id PK "Identity"
+        varchar(255) name "Not Null"
+        varchar(255) img "Not Null"
+        varchar(255) element "Not Null"
+        int pd_gasto "Not Null"
+        varchar(255) ritual_type "Not Null"
+        varchar(255) dano "Null"
+        varchar(255) effect "Null"
+        text description "Not Null"
+        int created_by FK "Null"
+    }
+    player_temporadas {
+        int id PK
+        int player_id FK "Not Null"
+        int temporada_id FK "Not Null"
+    }
+    player_characters {
+        int id PK
+        int player_id FK "Not Null"
+        int character_id FK "Not Null"
+    }
+    character_rituals {
+        int id PK
+        int character_id FK "Not Null"
+        int ritual_id FK "Not Null"
+    }
+    character_items {
+        int id PK
+        int character_id FK "Not Null"
+        int item_id FK "Not Null"
+        int quantity "Default 1 / > 0"
+    }
+    character_skills {
+        int id PK
+        int character_id FK "Not Null"
+        varchar(30) skill "Not Null"
     }
 
-players {
-    int id PK "Identity/Unique"
-    varchar(255) name "Unique/Not Null"
-    }
-
-characters {
-    int id PK "Identity"
-    varchar(255) name "Not Null"
-    varchar(255) img "Null"
-    int agi "Not Null"
-    int str "Not Null"
-    int intel "Not Null"
-    int pre "Not Null"
-    int vig "Not Null"
-    varchar(255) occupation "Not Null"
-    text history "Not Null"
-    varchar(255) personality "Not Null"
-    varchar(12) class "Not Null"
-    int nex "Not Null"
-    }
-
-items {
-    int id PK "Identity"
-    varchar(255) name "Not Null"
-    varchar(255) img "Null"
-    varchar(255) type_item "Not Null"
-    varchar(255) damage "Not Null"
-    varchar(255) effect "Not Null"
-    varchar(255) item_range "Not Null"
-    int prestige "Not Null"
-    text description "Not Null"
-    }
-
-rituals {
-    int id PK "Identity"
-    varchar(255) name "Not Null"
-    varchar(255) img "Null"
-    varchar(255) element "Not Null"
-    int pd_gasto "Not Null"
-    varchar(255) ritual_type "Not Null"
-    varchar(255) dano "Null"
-    varchar(255) effect "Null"
-    text description "Not Null"
-    }
-
-player_temporadas {
-    int id PK
-    int player_id FK "Not Null"
-    int temporada_id FK "Not Null"
-    }
-
-player_characters {
-    int id PK
-    int player_id FK "Not Null"
-    int character_id FK "Not Null"
-    }
-
-character_rituals {
-    int id PK
-    int character_id FK "Not Null"
-    int ritual_id FK "Not Null"
-    }
-
-character_items {
-    int id PK
-    int character_id FK "Not Null"
-    int item_id FK "Not Null"
-    int quantity "Default 1 / > 0"
-    }
-
-players ||--o{ player_temporadas : "tem"
-temporadas ||--o{ player_temporadas : "inclui"
-
-players ||--o{ player_characters : "joga_com"
-characters ||--o{ player_characters : "usado_por"
-
-characters ||--o{ character_rituals : "conhece"
-rituals ||--o{ character_rituals : "usado_em"
-
-characters ||--o{ character_items : "possui"
-items ||--o{ character_items : "carregado_em"
+    players ||--o{ player_temporadas : "tem"
+    temporadas ||--o{ player_temporadas : "inclui"
+    players ||--o{ player_characters : "joga_com"
+    characters ||--o{ player_characters : "usado_por"
+    characters ||--o{ character_rituals : "conhece"
+    rituals ||--o{ character_rituals : "usado_em"
+    characters ||--o{ character_items : "possui"
+    items ||--o{ character_items : "carregado_em"
+    characters ||--o{ character_skills : "treinado_em"
+    userTabela ||--o{ characters : "criou"
+    userTabela ||--o{ items : "criou"
+    userTabela ||--o{ rituals : "criou"
 ```
-### 6.2. Fluxo de [Processo]
+### 6.2. Fluxo de Processo
 
 ```mermaid
 flowchart TD

@@ -26,7 +26,7 @@ CREATE TABLE players (
 CREATE TABLE characters (
     id          INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     name        VARCHAR(255) NOT NULL,
-    img         VARCHAR(255),
+    img         VARCHAR(255) NOT NULL,
     agi         INTEGER NOT NULL CHECK (agi >= 0),
     str         INTEGER NOT NULL CHECK (str >= 0),
     intel       INTEGER NOT NULL CHECK (intel >= 0),
@@ -36,13 +36,14 @@ CREATE TABLE characters (
     history     TEXT NOT NULL,      
     personality VARCHAR(255) NOT NULL,  
     class       VARCHAR(12) NOT NULL CHECK (class IN ('Combatente', 'Especialista', 'Ocultista')),
-    nex         INTEGER NOT NULL CHECK (nex BETWEEN 0 AND 99)
+    nex         INTEGER NOT NULL CHECK (nex BETWEEN 0 AND 99),
+    created_by  INTEGER REFERENCES userTabela(id) ON DELETE SET NULL -- Conta que criou o personagem. Se a conta for apagada, o registro continua, só perde o criador
 );
 
 CREATE TABLE items (
     id           INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     name         VARCHAR(255) NOT NULL,
-    img          VARCHAR(255),
+    img          VARCHAR(255) NOT NULL,
     type_item    VARCHAR(255) NOT NULL,
     damage       VARCHAR(255), -- Só armas têm dano, efeito e alcance, por isso aceitam NULL
     effect       VARCHAR(255),
@@ -52,19 +53,21 @@ CREATE TABLE items (
     category     VARCHAR(3),
     space        INTEGER NOT NULL DEFAULT 1 CHECK (space >= 0),
     critical     VARCHAR(10),
-    damage_type  VARCHAR(20)
+    damage_type  VARCHAR(20),
+    created_by   INTEGER REFERENCES userTabela(id) ON DELETE SET NULL
 );
 
 CREATE TABLE rituals (
     id           INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     name         VARCHAR(255) NOT NULL,
-    img          VARCHAR(255),
+    img          VARCHAR(255) NOT NULL,
     element      VARCHAR(255) NOT NULL,
     pd_gasto     INTEGER NOT NULL,
     ritual_type  VARCHAR(255) NOT NULL, 
     dano         VARCHAR(255),
     effect       VARCHAR(255),
-    description  TEXT NOT NULL
+    description  TEXT NOT NULL,
+    created_by   INTEGER REFERENCES userTabela(id) ON DELETE SET NULL
 );
 
 -- Tabelas de conexão
@@ -109,5 +112,8 @@ CREATE INDEX idx_player_temporadas_temporada ON player_temporadas(temporada_id);
 CREATE INDEX idx_player_characters_character ON player_characters(character_id);
 CREATE INDEX idx_character_rituals_ritual    ON character_rituals(ritual_id);
 CREATE INDEX idx_character_items_item        ON character_items(item_id);
+CREATE INDEX idx_characters_created_by       ON characters(created_by);
+CREATE INDEX idx_items_created_by            ON items(created_by);
+CREATE INDEX idx_rituals_created_by          ON rituals(created_by);
 
 SELECT * FROM userTabela;
