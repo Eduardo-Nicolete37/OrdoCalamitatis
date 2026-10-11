@@ -32,7 +32,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($pd_gasto === false || $pd_gasto === null || $pd_gasto < 0) {
             throw new Exception("Custo em PD inválido.");
         }
-        criaRitual($conexao, $name, $pathImage, $element, $ritual_type, $pd_gasto, $dano, $effect, $description);
+        $created_by = $_SESSION['id'];
+        criaRitual($conexao, $name, $pathImage, $element, $ritual_type, $pd_gasto, $dano, $effect, $description, $created_by);
         header('Location: /OrdoCalamitatis/app/adm/creations.php');
         exit;
 

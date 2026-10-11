@@ -16,13 +16,14 @@ function criaPersonagem(
     $personality,
     $class,
     $nex,
-    $pericias
+    $pericias, 
+    $created_by
 ) {
     try {
         $conexao->beginTransaction();
 
-        $sql = "INSERT INTO characters (name, img, agi, str, intel, pre, vig, history, occupation, personality, class, nex)
-        VALUES (:name, :img, :agi, :str, :intel, :pre, :vig, :history, :occupation, :personality, :class, :nex)
+        $sql = "INSERT INTO characters (name, img, agi, str, intel, pre, vig, history, occupation, personality, class, nex, created_by)
+        VALUES (:name, :img, :agi, :str, :intel, :pre, :vig, :history, :occupation, :personality, :class, :nex, :created_by)
         RETURNING id";
         $stmt = $conexao->prepare($sql);
         $stmt->execute([
@@ -38,6 +39,7 @@ function criaPersonagem(
             ':personality' => $personality,
             ':class' => $class,
             ':nex' => $nex,
+            ':created_by' => $created_by,
         ]);
         $character_id = $stmt->fetchColumn();
 
@@ -51,13 +53,15 @@ function criaPersonagem(
 
         $conexao->commit();
         return true;
-    } catch (PDOException $e) {
-        $conexao->rollBack();
+         } catch (Throwable $e) {
+        if ($conexao->inTransaction()) {
+            $conexao->rollBack();
+        }
         throw $e;
-    }
+         }
 }
 
-function criaItem($conexao, $name, $foto, $type_item, $damage, $damage_type, $critical, $item_range, $effect, $category, $space, $prestige, $description) {
+function criaItem($conexao, $name, $pathImage, $type_item, $damage, $damage_type, $critical, $item_range, $effect, $category, $space, $prestige, $description, $created_by, $character_id = null, $quantity = 1) {
     try {
         $conexao->beginTransaction();
 
@@ -73,7 +77,8 @@ function criaItem($conexao, $name, $foto, $type_item, $damage, $damage_type, $cr
                     category,
                     space,
                     prestige,
-                    description
+                    description, 
+                    created_by
                 )
                 VALUES (
                     :name,
@@ -87,7 +92,8 @@ function criaItem($conexao, $name, $foto, $type_item, $damage, $damage_type, $cr
                     :category,
                     :space,
                     :prestige,
-                    :description
+                    :description, 
+                    :created_by
                 )
                 RETURNING id";
 
@@ -95,7 +101,7 @@ function criaItem($conexao, $name, $foto, $type_item, $damage, $damage_type, $cr
 
         $stmt->execute([
             ':name'        => $name,
-            ':img'         => $foto,
+            ':img'         => $pathImage,
             ':type_item'   => $type_item,
             ':damage'      => $damage !== '' ? $damage : null,
             ':damage_type' => $damage_type !== '' ? $damage_type : null,
@@ -105,10 +111,16 @@ function criaItem($conexao, $name, $foto, $type_item, $damage, $damage_type, $cr
             ':category'    => $category !== '' ? $category : null,
             ':space'       => $space,
             ':prestige'    => $prestige,
-            ':description' => $description
+            ':description' => $description,
+            ':created_by' => $created_by,
         ]);
 
         $item_id = $stmt->fetchColumn();
+
+        if ($character_id) {
+            $stmt = $conexao->prepare("INSERT INTO character_items (character_id, item_id, quantity) VALUES (:c, :i, :q)");
+            $stmt->execute([':c' => $character_id, ':i' => $item_id, ':q' => $quantity]);
+        }
 
         $conexao->commit();
 
@@ -122,7 +134,7 @@ function criaItem($conexao, $name, $foto, $type_item, $damage, $damage_type, $cr
         throw $e;
     }
 }
-function criaRitual($conexao, $name, $pathImage, $element, $ritual_type, $pd_gasto, $dano, $effect, $description) {
+function criaRitual($conexao, $name, $pathImage, $element, $ritual_type, $pd_gasto, $dano, $effect, $description, $created_by, $character_id = null) {
     try {
         $conexao->beginTransaction();
 
@@ -134,7 +146,8 @@ function criaRitual($conexao, $name, $pathImage, $element, $ritual_type, $pd_gas
                     ritual_type,
                     dano,
                     effect,
-                    description
+                    description, 
+                    created_by
                 )
                 VALUES (
                     :name,
@@ -144,7 +157,8 @@ function criaRitual($conexao, $name, $pathImage, $element, $ritual_type, $pd_gas
                     :ritual_type,
                     :dano,
                     :effect,
-                    :description
+                    :description, 
+                    :created_by
                 )
                 RETURNING id";
 
@@ -156,13 +170,17 @@ function criaRitual($conexao, $name, $pathImage, $element, $ritual_type, $pd_gas
             ':element'   => $element,
             ':pd_gasto'      => $pd_gasto,
             ':ritual_type' => $ritual_type,
-            ':dano'    => $dano,
-            ':effect' => $effect,
-            ':description' => $description
+            ':dano'   => $dano !== '' ? $dano : null,
+            ':effect' => $effect !== '' ? $effect : null,
+            ':description' => $description,
+            ':created_by' => $created_by
         ]);
 
         $ritual_id = $stmt->fetchColumn();
-
+        if ($character_id) {
+            $stmt = $conexao->prepare("INSERT INTO character_rituals (character_id, ritual_id) VALUES (:c, :r)");
+            $stmt->execute([':c' => $character_id, ':r' => $ritual_id]);
+        }
         $conexao->commit();
 
         return $ritual_id;
@@ -176,9 +194,25 @@ function criaRitual($conexao, $name, $pathImage, $element, $ritual_type, $pd_gas
 }
 // Funções ligadas a leitura do Banco de Dados (READ) 
 function readPersonagens($conexao, $id_user) {
-
-    $sql = "SELECT id, name, img FROM characters WHERE ORDER BY id"; // Definimos a função que será enviada ao SQL
-
+    $sql = "SELECT id, name, img FROM characters WHERE created_by = :id_user ORDER BY id"; // Definimos a função que será enviada ao SQL
+    $stmt = $conexao->prepare($sql);
+    $stmt->bindParam(":id_user", $id_user);
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+function readItems($conexao, $id_user) {
+    $sql = "SELECT id, name, img FROM items WHERE created_by = :id_user ORDER BY id"; // Definimos a função que será enviada ao SQL
+    $stmt = $conexao->prepare($sql);
+    $stmt->bindParam(":id_user", $id_user);
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+function readRituals($conexao, $id_user) {
+    $sql = "SELECT id, name, img FROM rituals WHERE created_by = :id_user ORDER BY id"; // Definimos a função que será enviada ao SQL
+    $stmt = $conexao->prepare($sql);
+    $stmt->bindParam(":id_user", $id_user);
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
 // Funções relacionadas ao Login
@@ -247,7 +281,10 @@ function downloadImage()
     }
 
     $arquivo = $_FILES['foto'];
-
+    // Apita SOMENTE no caso de que nenhuma imagem foi enviada
+    if ($arquivo['error'] === UPLOAD_ERR_NO_FILE) {
+    throw new Exception("Selecione uma imagem.");
+}
     // Verificação de erros nativos do PHP no upload
     if ($arquivo['error'] !== UPLOAD_ERR_OK) {
         throw new Exception("Erro no envio do arquivo.");

@@ -85,8 +85,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($nex < 0 || $nex > 99) {
             throw new Exception("NEX deve estar entre 0 e 99.");
         }
-
-        criaPersonagem($conexao, $player_id, $name, $pathImage, $agi, $str, $intel, $pre, $vig, $history, $occupation, $personality, $class, $nex, $pericias);
+        $created_by = $_SESSION['id'];
+        criaPersonagem($conexao, $player_id, $name, $pathImage, $agi, $str, $intel, $pre, $vig, $history, $occupation, $personality, $class, $nex, $pericias, $created_by);
 
         header('Location: /OrdoCalamitatis/app/adm/creations.php');
         exit;
