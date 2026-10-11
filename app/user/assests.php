@@ -31,6 +31,9 @@
             <li><a href="/pdfs/ordem-paranormal-regras-book.pdf" download="ordem-paranormal-regras-book.pdf">Livro de Regras</a> </li>
         </ul>
     </main>
+    <footer>
+        <?php include_once __DIR__ . "/../../includes/footer.php";?>
+    </footer>
 </body>
 
 </html>

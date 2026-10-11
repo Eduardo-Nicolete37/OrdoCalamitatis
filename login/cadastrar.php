@@ -1,4 +1,4 @@
-<?php 
+<?php
 require_once '../includes/helpers.php'; // Chamamos o helpers.php para podermos usar as funções que estão lá
 ?>
 <!DOCTYPE html>
@@ -17,7 +17,7 @@ require_once '../includes/helpers.php'; // Chamamos o helpers.php para podermos 
         include '../includes/header.php'; // Chamamos o header que está nos includes
         ?>
         <header>
-            <h1>Registre-se no sistema  - Ordo Calamitatis</h1>
+            <h1>Registre-se no sistema - Ordo Calamitatis</h1>
         </header>
         <hr>
         <main>
@@ -35,7 +35,6 @@ require_once '../includes/helpers.php'; // Chamamos o helpers.php para podermos 
             <p>Já tem cadastro? <a href="./login.php">Entre aqui</a></p>
             <hr>
             <?php
-            include '../includes/footer.php'; //Chamamos o footer que está nos includes
             // Esse if serve para o php somente comece no momento em que o formulário seja submetido
             if ($_SERVER['REQUEST_METHOD'] == "POST") {
                 if (!isset($_POST['email']) || !isset($_POST['senha']) || !isset($_POST['username']) || !isset($_POST['senhaConfirm'])) {
@@ -58,6 +57,12 @@ require_once '../includes/helpers.php'; // Chamamos o helpers.php para podermos 
 
             ?>
         </main>
+
+        <footer>
+            <?php
+            include_once  __DIR__ . '/../includes/footer.php'; //Chamamos o footer que está nos includes
+            ?>
+        </footer>
     </div>
 </body>
 

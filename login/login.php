@@ -12,7 +12,6 @@ require_once '../includes/helpers.php'; // Chamamos o helpers.php para podermos 
 </head>
 
 <body>
-    <div class="create">
         <header>
             <?php
             include '..\includes\header.php'; // Chamamos o header que está nos includes
@@ -57,8 +56,9 @@ require_once '../includes/helpers.php'; // Chamamos o helpers.php para podermos 
 
             ?>
         </main>
-        <hr>
-    </div>
+        <footer>
+            <?php include_once __DIR__ . '/../includes/footer.php';?>
+        </footer>
 </body>
 
 </html>
