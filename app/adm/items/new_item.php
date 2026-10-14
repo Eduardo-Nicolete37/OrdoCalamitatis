@@ -1,6 +1,6 @@
 <?php
-require_once __DIR__ . '/../../login/verifica_user.php';
-require_once __DIR__ . '/../../includes/helpers.php';
+require_once __DIR__ . '/../../../login/verifica_user.php';
+require_once __DIR__ . '/../../../includes/helpers.php';
 $created_by = $_SESSION['id'];
 $personagens = readPersonagens($conexao, $created_by);
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -72,7 +72,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <body>
     <header>
-        <?php include_once __DIR__ . '/../../includes/header.php'; ?>
+        <?php include_once __DIR__ . '/../../../includes/header.php'; ?>
         <h1>Novo Item</h1>
     </header>
     <main>
@@ -150,7 +150,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </main>
     <footer>
         <?php
-        include_once __DIR__ . '/../../includes/footer.php';
+        include_once __DIR__ . '/../../../includes/footer.php';
         ?>
     </footer>
 </body>

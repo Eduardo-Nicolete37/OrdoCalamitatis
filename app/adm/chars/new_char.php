@@ -1,6 +1,6 @@
 <?php
-require_once __DIR__ . '/../../login/verifica_user.php';
-require_once __DIR__ . '/../../includes/helpers.php';
+require_once __DIR__ . '\..\..\..\login\verifica_user.php';
+require_once __DIR__ . '\..\..\..\includes\helpers.php';
 
 $erro = null;
 
@@ -9,7 +9,8 @@ $grupos_tracos = [
     'Impulsivos' => ['Protetor', 'Impulsivo', 'Vingativo'],
     'Instáveis'  => ['Paranoico', 'Empático', 'Excêntrico'],
 ];
-
+$rituais_lista = listaRituais($conexao);
+$items_lista = listaItems($conexao);
 $lista_pericias = [
     'Acrobacia',
     'Adestramento',
@@ -82,18 +83,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $pericias = array_values(array_intersect($_POST['pericias'] ?? [], $lista_pericias));
 
+        $ids_rituais = array_map('intval', array_column($rituais_lista, 'id'));
+        $rituais = array_values(array_unique(array_intersect(array_map('intval', (array) ($_POST['rituais'] ?? [])), $ids_rituais)));
+        $ids_items = array_map('intval', array_column($items_lista, 'id'));
+        $items_selecionados = $_POST['items'] ?? [];
+
+        $items = [];
+
+        foreach ($items_selecionados as $item_id => $quantidade) {
+            $item_id = (int) $item_id;
+            $quantidade = (int) $quantidade;
+
+            if (in_array($item_id, $ids_items, true) && $quantidade > 0) {
+                $items[] = ['item_id' => $item_id, 'quantity' => $quantidade];
+            }
+        }
+
         if ($nex < 0 || $nex > 99) {
             throw new Exception("NEX deve estar entre 0 e 99.");
         }
         $created_by = $_SESSION['id'];
-        criaPersonagem($conexao, $player_id, $name, $pathImage, $agi, $str, $intel, $pre, $vig, $history, $occupation, $personality, $class, $nex, $pericias, $created_by);
+        criaPersonagem($conexao, $player_id, $name, $pathImage, $agi, $str, $intel, $pre, $vig, $history, $occupation, $personality, $class, $nex, $pericias, $created_by, $rituais, $items);
 
         header('Location: /OrdoCalamitatis/app/adm/creations.php');
         exit;
     } catch (Exception $e) {
         // Apaga a imagem enviada se algo falhou depois do upload
         if ($pathImage) {
-            $arquivo = __DIR__ . '/../../' . $pathImage;
+            $arquivo = __DIR__ . '/../../../' . $pathImage;
             if (is_file($arquivo)) {
                 unlink($arquivo);
             }
@@ -109,14 +126,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="./../../style/style.css">
+    <link rel="stylesheet" href="./../../../style/style.css">
     <title>Novo Personagem - Ordo Calamitatis</title>
 </head>
 
 <body>
     <header>
         <?php
-        include_once __DIR__ . "/../../includes/header.php";
+        include_once __DIR__ . "/../../../includes/header.php";
         ?>
         <h1>Novo Personagem</h1>
     </header>
@@ -201,6 +218,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <?php endforeach; ?>
             </fieldset>
 
+            <fieldset class="rolavel">
+                <legend>Rituais dominados (opcional):</legend>
+                <?php if (!$rituais_lista): ?>
+                    <p style="text-align: center; width: 100%;">Nenhum ritual cadastrado ainda.</p>
+                <?php endif; ?>
+                <?php foreach ($rituais_lista as $r): ?>
+                    <label>
+                        <input type="checkbox" name="rituais[]" value="<?= (int) $r['id'] ?>">
+                        <?= htmlspecialchars($r['name']) ?>
+                    </label>
+                <?php endforeach; ?>
+            </fieldset>
+            <fieldset class="rolavel">
+                <legend>Itens portados (opcional):</legend>
+
+                <?php if (!$items_lista): ?>
+                    <p style="text-align: center; width: 100%;">Nenhum item cadastrado ainda.</p>
+                <?php endif; ?>
+
+                <?php foreach ($items_lista as $i): ?>
+                    <div class="item-personagem">
+                        <label for="item_<?= (int) $i['id'] ?>">
+                            <?= htmlspecialchars($i['name']) ?>
+                        </label>
+
+                        <input
+                            type="number"
+                            id="item_<?= (int) $i['id'] ?>"
+                            name="items[<?= (int) $i['id'] ?>]"
+                            min="0"
+                            value="0">
+                    </div>
+                <?php endforeach; ?>
+            </fieldset>
             <label for="history">História: </label>
             <textarea name="history" id="history" required placeholder="Era uma vez..."></textarea>
 
@@ -211,8 +262,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </form>
     </main>
     <footer>
-        <?php 
-        include_once  __DIR__ . '/../../includes/footer.php';
+        <?php
+        include_once  __DIR__ . '/../../../includes/footer.php';
         ?>
     </footer>
 </body>

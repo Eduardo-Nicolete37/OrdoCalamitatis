@@ -1,7 +1,8 @@
-<?php 
-require_once __DIR__ . '/../../login/verifica_user.php';
-require_once __DIR__ . '/../../includes/helpers.php';
-
+<?php
+require_once __DIR__ . '/../../../login/verifica_user.php';
+require_once __DIR__ . '/../../../includes/helpers.php';
+$created_by = $_SESSION['id'];
+$personagens = readPersonagens($conexao, $created_by);
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $pathImage = null;
     try {
@@ -32,16 +33,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($pd_gasto === false || $pd_gasto === null || $pd_gasto < 0) {
             throw new Exception("Custo em PD inválido.");
         }
-        $created_by = $_SESSION['id'];
-        criaRitual($conexao, $name, $pathImage, $element, $ritual_type, $pd_gasto, $dano, $effect, $description, $created_by);
+        $ids_personagens = array_map('intval', array_column($personagens, 'id'));
+        $donos = array_values(array_unique(array_intersect(array_map('intval', (array) ($_POST['personagens'] ?? [])), $ids_personagens)));
+        criaRitual($conexao, $name, $pathImage, $element, $ritual_type, $pd_gasto, $dano !== '' ? $dano : null, $effect !== '' ? $effect : null, $description, $created_by, $donos);
         header('Location: /OrdoCalamitatis/app/adm/creations.php');
         exit;
-
-    }  catch (Throwable $e) {
-    echo '<pre>';
-    echo htmlspecialchars($e->__toString());
-    echo '</pre>';
-    exit;
+    } catch (Throwable $e) {
+        echo '<pre>';
+        echo htmlspecialchars($e->__toString());
+        echo '</pre>';
+        exit;
     }
 }
 
@@ -59,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <body>
     <header>
-        <?php include_once __DIR__ . "/../../includes/header.php"; ?>
+        <?php include_once __DIR__ . "/../../../includes/header.php"; ?>
         <h1>Novo Ritual</h1>
     </header>
     <main>
@@ -89,6 +90,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <option value="4º Círculo">4º Círculo</option>
             </select>
 
+            <fieldset class="rolavel">
+                <legend>Personagens que conhecem este ritual:</legend>
+                <?php if (!$personagens): ?>
+                    <p>Nenhum personagem cadastrado ainda.</p>
+                <?php endif; ?>
+                <?php foreach ($personagens as $p): ?>
+                    <label>
+                        <input type="checkbox" name="personagens[]" value="<?= (int) $p['id'] ?>">
+                        <?= htmlspecialchars($p['name']) ?> (#<?= (int) $p['id'] ?>)
+                    </label>
+                <?php endforeach; ?>
+            </fieldset>
+
             <label for="pd_gasto">Custo (PD): </label>
             <input type="number" name="pd_gasto" id="pd_gasto" required min="0" placeholder="5">
 
@@ -96,7 +110,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <input type="text" name="dano" id="dano" maxlength="255" placeholder="2d6">
 
             <label for="effect">Efeito: </label>
-            <input type="text" name="effect" id="effect" maxlength="255" placeholder="Alvo fica amedrontado">
+            <input type="text" name="effect" id="effect" placeholder="Alvo fica amedrontado">
 
             <label for="description">Descrição: </label>
             <textarea name="description" id="description" required></textarea>
@@ -104,6 +118,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <input type="submit" value="Enviar">
         </form>
     </main>
+    <footer>
+        <?php include_once  __DIR__ . '/../../../includes/footer.php';?>
+    </footer>
 </body>
 
 </html>
