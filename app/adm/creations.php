@@ -35,7 +35,7 @@ require_once __DIR__ . '/../../includes/helpers.php';
                 echo '<hr>';
                 echo "<ol>";
                 foreach ($characters_list as $p) {
-                echo "<li>" . "<a href='./char_adm.php?id=" . $p['id'] . "'>" . htmlspecialchars($p['name']) . "</a> </li> <br>";} 
+                echo "<li>" . "<a href='./chars/char_adm.php?id=" . $p['id'] . "'>" . htmlspecialchars($p['name']) . "</a> </li> <br>";} 
                 echo "</ol>";
             } else {
                 echo "<p>Nenhum personagem encontrado!</p>";
@@ -48,10 +48,10 @@ require_once __DIR__ . '/../../includes/helpers.php';
                 echo '<hr>';
                 echo '<ol>';
                 foreach ($items_list as $p) {
-                echo "<li>" . "<a href='./items_adm.php?id=" . $p['id'] . "'>" . htmlspecialchars($p['name']) . "</a> </li> <br>";}
+                echo "<li>" . "<a href='./items/items_adm.php?id=" . $p['id'] . "'>" . htmlspecialchars($p['name']) . "</a> </li> <br>";}
                 echo "</ol>";
             } else {
-                echo "<p>Nenhum items encontrado!</p>";
+                echo "<p>Nenhum item encontrado!</p>";
                 echo "<p><a href='/OrdoCalamitatis/app/adm/items/new_item.php'>Crie um novo aqui</a></p>";
             }
         } elseif (isset($_GET['rituais'])) {
@@ -61,7 +61,7 @@ require_once __DIR__ . '/../../includes/helpers.php';
                 echo '<hr>';
                 echo "<ol>";
                 foreach ($rituals_list as $p) {
-                echo "<li>" . "<a href='./ritual_adm.php?id=" . $p['id'] . "'>" . htmlspecialchars($p['name']) . "</a> </li> <br>";}
+                echo "<li>" . "<a href='./rituals/ritual_adm.php?id=" . $p['id'] . "'>" . htmlspecialchars($p['name']) . "</a> </li> <br>";}
                 echo "</ol>";
             } else {
                 echo "<p>Nenhum ritual encontrado!</p>";
