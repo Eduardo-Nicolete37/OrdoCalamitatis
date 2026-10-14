@@ -241,25 +241,25 @@ function readSpecificPersonagem($conexao, $id_user, $id_char)
 {
     $sql = "SELECT c.*,
                u.username AS criador,
+            (SELECT pc.player_id FROM player_characters pc WHERE pc.character_id = c.id LIMIT 1 ) AS player_id,
+            (SELECT json_agg(p.name ORDER BY p.name) -- json_agg é usado para juntar várias colunas num array só
+            FROM player_characters pc
+            JOIN players p ON p.id = pc.player_id
+            WHERE pc.character_id = c.id) AS players,
 
-               (SELECT json_agg(p.name ORDER BY p.name)
-                FROM player_characters pc
-                JOIN players p ON p.id = pc.player_id
-                WHERE pc.character_id = c.id) AS players,
+            (SELECT json_agg(skill ORDER BY skill)
+            FROM character_skills
+            WHERE character_id = c.id) AS pericias,
 
-               (SELECT json_agg(skill ORDER BY skill)
-                FROM character_skills
-                WHERE character_id = c.id) AS pericias,
+           (SELECT json_agg(json_build_object('name', i.name, 'quantity', ci.quantity) ORDER BY i.name)
+            FROM character_items ci
+            JOIN items i ON i.id = ci.item_id
+            WHERE ci.character_id = c.id) AS itens,
 
-               (SELECT json_agg(json_build_object('name', i.name, 'quantity', ci.quantity) ORDER BY i.name)
-                FROM character_items ci
-                JOIN items i ON i.id = ci.item_id
-                WHERE ci.character_id = c.id) AS itens,
-
-               (SELECT json_agg(r.name ORDER BY r.name)
-                FROM character_rituals cr
-                JOIN rituals r ON r.id = cr.ritual_id
-                WHERE cr.character_id = c.id) AS rituais
+           (SELECT json_agg(r.name ORDER BY r.name)
+            FROM character_rituals cr
+            JOIN rituals r ON r.id = cr.ritual_id
+            WHERE cr.character_id = c.id) AS rituais
 
         FROM characters c
         LEFT JOIN userTabela u ON u.id = c.created_by
@@ -280,6 +280,33 @@ function readSpecificPersonagem($conexao, $id_user, $id_char)
     $p['criador'] = $p['criador'] ?? 'desconhecido';
 
     return $p;
+}
+
+function readSpecificItem($conexao, $id_user, $id_item)
+{
+    $sql = "SELECT i.*,
+                   u.username AS criador
+            FROM items i
+            LEFT JOIN userTabela u ON u.id = i.created_by
+            WHERE i.id = :id_item
+              AND i.created_by = :id_user";
+
+    $stmt = $conexao->prepare($sql);
+
+    $stmt->execute([
+        ':id_user' => $id_user,
+        ':id_item' => $id_item
+    ]);
+
+    $item = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$item) {
+        return false;
+    }
+
+    $item['criador'] = $item['criador'] ?? 'desconhecido';
+
+    return $item;
 }
 
 // Funções relacionadas ao Login

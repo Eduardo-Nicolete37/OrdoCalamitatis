@@ -18,7 +18,7 @@
         </div>
         <div>
             <a href="/OrdoCalamitatis/" class="logo-navbar">
-                <img src="/OrdoCalamitatis/" alt="logo"> <!--Placeholder por agora-->
+                <img src="/OrdoCalamitatis/imgs/imgLogo.webp" alt="logo"> <!--Placeholder por agora-->
             </a>
         </div>
         <?php 
