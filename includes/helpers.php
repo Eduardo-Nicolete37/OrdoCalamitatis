@@ -16,8 +16,10 @@ function criaPersonagem(
     $personality,
     $class,
     $nex,
-    $pericias, 
-    $created_by
+    $pericias,
+    $created_by,
+    $rituais = [],
+    $items = []
 ) {
     try {
         $conexao->beginTransaction();
@@ -50,18 +52,26 @@ function criaPersonagem(
         foreach ($pericias as $skill) {
             $stmt->execute([':c' => $character_id, ':s' => $skill]);
         }
-
+        $stmt = $conexao->prepare("INSERT INTO character_rituals (character_id, ritual_id) VALUES (:c, :r)");
+        foreach ($rituais as $ritual_id) {
+            $stmt->execute([':c' => $character_id, ':r' => $ritual_id]);
+        }
+        $stmt = $conexao->prepare("INSERT INTO character_items (character_id, items_id, quantity) VALUES (:c, :r, :q)");
+        foreach ($items as $item) {
+            $stmt->execute([':c' => $character_id, ':r' => $item['item_id'], ':q' => $item['quantity']]);
+        }
         $conexao->commit();
         return true;
-         } catch (Throwable $e) {
+    } catch (Throwable $e) {
         if ($conexao->inTransaction()) {
             $conexao->rollBack();
         }
         throw $e;
-         }
+    }
 }
 
-function criaItem($conexao, $name, $pathImage, $type_item, $damage, $damage_type, $critical, $item_range, $effect, $category, $space, $prestige, $description, $created_by, $character_id = null, $quantity = 1) {
+function criaItem($conexao, $name, $pathImage, $type_item, $damage, $damage_type, $critical, $item_range, $effect, $category, $space, $prestige, $description, $created_by, $character_id = null, $quantity = 1)
+{
     try {
         $conexao->beginTransaction();
 
@@ -125,7 +135,6 @@ function criaItem($conexao, $name, $pathImage, $type_item, $damage, $damage_type
         $conexao->commit();
 
         return $item_id;
-
     } catch (Throwable $e) {
         if ($conexao->inTransaction()) {
             $conexao->rollBack();
@@ -134,7 +143,8 @@ function criaItem($conexao, $name, $pathImage, $type_item, $damage, $damage_type
         throw $e;
     }
 }
-function criaRitual($conexao, $name, $pathImage, $element, $ritual_type, $pd_gasto, $dano, $effect, $description, $created_by, $character_id = null) {
+function criaRitual($conexao, $name, $pathImage, $element, $ritual_type, $pd_gasto, $dano, $effect, $description, $created_by, $characters_ids = [])
+{
     try {
         $conexao->beginTransaction();
 
@@ -177,10 +187,12 @@ function criaRitual($conexao, $name, $pathImage, $element, $ritual_type, $pd_gas
         ]);
 
         $ritual_id = $stmt->fetchColumn();
-        if ($character_id) {
-            $stmt = $conexao->prepare("INSERT INTO character_rituals (character_id, ritual_id) VALUES (:c, :r)");
+
+        $stmt = $conexao->prepare("INSERT INTO character_rituals (character_id, ritual_id) VALUES (:c, :r)");
+        foreach ($characters_ids as $character_id) {
             $stmt->execute([':c' => $character_id, ':r' => $ritual_id]);
         }
+
         $conexao->commit();
 
         return $ritual_id;
@@ -193,26 +205,81 @@ function criaRitual($conexao, $name, $pathImage, $element, $ritual_type, $pd_gas
     }
 }
 // Funções ligadas a leitura do Banco de Dados (READ) 
-function readPersonagens($conexao, $id_user) {
+function readPersonagens($conexao, $id_user)
+{
     $sql = "SELECT id, name, img FROM characters WHERE created_by = :id_user ORDER BY id"; // Definimos a função que será enviada ao SQL
     $stmt = $conexao->prepare($sql);
     $stmt->bindParam(":id_user", $id_user);
     $stmt->execute();
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
-function readItems($conexao, $id_user) {
+function readItems($conexao, $id_user)
+{
     $sql = "SELECT id, name, img FROM items WHERE created_by = :id_user ORDER BY id"; // Definimos a função que será enviada ao SQL
     $stmt = $conexao->prepare($sql);
     $stmt->bindParam(":id_user", $id_user);
     $stmt->execute();
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
-function readRituals($conexao, $id_user) {
+function readRituals($conexao, $id_user)
+{
     $sql = "SELECT id, name, img FROM rituals WHERE created_by = :id_user ORDER BY id"; // Definimos a função que será enviada ao SQL
     $stmt = $conexao->prepare($sql);
     $stmt->bindParam(":id_user", $id_user);
     $stmt->execute();
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+function listaRituais($conexao)
+{
+    return $conexao->query("SELECT id, name, ritual_type FROM rituals ORDER BY name, id")->fetchAll(PDO::FETCH_ASSOC);
+}
+function listaItems($conexao)
+{
+    return $conexao->query("SELECT * FROM items ORDER BY name, id")->fetchAll(PDO::FETCH_ASSOC);
+}
+function readSpecificPersonagem($conexao, $id_user, $id_char)
+{
+    $sql = "SELECT c.*,
+               u.username AS criador,
+
+               (SELECT json_agg(p.name ORDER BY p.name)
+                FROM player_characters pc
+                JOIN players p ON p.id = pc.player_id
+                WHERE pc.character_id = c.id) AS players,
+
+               (SELECT json_agg(skill ORDER BY skill)
+                FROM character_skills
+                WHERE character_id = c.id) AS pericias,
+
+               (SELECT json_agg(json_build_object('name', i.name, 'quantity', ci.quantity) ORDER BY i.name)
+                FROM character_items ci
+                JOIN items i ON i.id = ci.item_id
+                WHERE ci.character_id = c.id) AS itens,
+
+               (SELECT json_agg(r.name ORDER BY r.name)
+                FROM character_rituals cr
+                JOIN rituals r ON r.id = cr.ritual_id
+                WHERE cr.character_id = c.id) AS rituais
+
+        FROM characters c
+        LEFT JOIN userTabela u ON u.id = c.created_by
+        WHERE c.id = :id_char AND c.created_by = :id_user"; // Definimos a função que será enviada ao SQL
+    $stmt = $conexao->prepare($sql);
+    $stmt->execute([
+        ':id_user' => $id_user,
+        ':id_char' => $id_char
+    ]);
+    $p = $stmt->fetch(PDO::FETCH_ASSOC);
+    if (!$p) {
+        return false;
+    }
+
+    foreach (['players', 'pericias', 'itens', 'rituais'] as $campo) {
+        $p[$campo] = json_decode($p[$campo] ?? '[]', true);
+    }
+    $p['criador'] = $p['criador'] ?? 'desconhecido';
+
+    return $p;
 }
 
 // Funções relacionadas ao Login
@@ -283,8 +350,8 @@ function downloadImage()
     $arquivo = $_FILES['foto'];
     // Apita SOMENTE no caso de que nenhuma imagem foi enviada
     if ($arquivo['error'] === UPLOAD_ERR_NO_FILE) {
-    throw new Exception("Selecione uma imagem.");
-}
+        throw new Exception("Selecione uma imagem.");
+    }
     // Verificação de erros nativos do PHP no upload
     if ($arquivo['error'] !== UPLOAD_ERR_OK) {
         throw new Exception("Erro no envio do arquivo.");
