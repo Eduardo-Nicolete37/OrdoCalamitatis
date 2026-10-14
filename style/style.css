@@ -327,7 +327,31 @@ hr {
     border: none;
     border-top: 1px solid var(--border);
 }
+/* ---------- Logo ---------- */
 
+.logo-navbar img {
+    display: block;
+    height: 60px;
+    width: auto;
+    border: 1px solid var(--wine-dark);
+    border-radius: 6px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.45);
+    transition: filter var(--transition);
+}
+
+.navConfig .logo-navbar a {
+    display: inline-flex;
+    padding: 0;
+    border-radius: 6px;
+}
+
+.navConfig .logo-navbar a:hover {
+    background-color: transparent;
+}
+
+.logo-navbar a:hover img {
+    filter: brightness(1.12);
+}
 /* ---------- Caixa principal (login, cadastro, formulários) ---------- */
 
 main {
