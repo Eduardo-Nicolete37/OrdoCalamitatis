@@ -30,6 +30,11 @@
 
     --font-title: 'Special Elite', system-ui, sans-serif;
     --font-body: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+    --el-sangue: #D1473A;
+    --el-morte: #8E8E96;
+    --el-conhecimento: #D4A72C;
+    --el-energia: #9B6BF2;
+    --el-medo: #F2F2F2;
 }
 
 /* ---------- Base ---------- */
@@ -168,6 +173,85 @@ nav {
     display: block;
     padding: 10px 20px;
     border-radius: 0;
+}
+
+/* ---------- Ficha do personagem ---------- */
+
+main.ficha {
+    text-align: left;
+}
+
+main.ficha h1 {
+    margin-bottom: 4px;
+}
+
+.ficha-id {
+    margin-top: 0;
+    color: var(--text-muted);
+    font-family: var(--font-title);
+    text-align: center;
+}
+
+.ficha-foto {
+    display: block;
+    max-width: 100%;
+    max-height: 320px;
+    margin: 16px auto;
+    border-radius: 8px;
+}
+
+.ficha section {
+    margin-top: 24px;
+}
+
+.ficha h2 {
+    margin: 0 0 12px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+    font-size: 1.1rem;
+    text-align: left;
+}
+
+.atributos {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+    margin: 0;
+}
+
+.atributos div {
+    padding: 10px 4px;
+    border: 1px solid var(--cor, var(--border));
+    border-radius: 8px;
+    background-color: rgba(255, 255, 255, 0.02);
+    background-color: color-mix(in srgb, var(--cor, white) 12%, transparent);
+    text-align: center;
+}
+
+.atributos dt {
+    color: var(--cor, var(--text-muted));
+    font-family: var(--font-title);
+    font-size: 0.75rem;
+    overflow-wrap: anywhere;
+}
+
+.atributos dd {
+    margin: 4px 0 0;
+    font-family: var(--font-title);
+    font-size: 1.5rem;
+}
+
+.atr-agi   { --cor: var(--el-energia); }
+.atr-str   { --cor: var(--el-sangue); }
+.atr-intel { --cor: var(--el-conhecimento); }
+.atr-pre   { --cor: var(--el-medo); }
+.atr-vig   { --cor: var(--el-morte); }
+
+@media (max-width: 520px) {
+    .atributos {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
 }
 
 /* ---------- Menu de filtro (segunda navbar) ---------- */
@@ -793,7 +877,50 @@ footer svg {
         grid-template-columns: 1fr;
     }
 }
+/* ---------- Botões ---------- */
 
+.acoes {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+}
+
+.btn {
+    display: inline-block;
+    width: auto;
+    padding: 10px 22px;
+    border: 1px solid var(--wine-dark);
+    border-radius: var(--radius-sm);
+    background-color: var(--wine);
+    color: white;
+    font-family: var(--font-title);
+    font-size: 0.95rem;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color var(--transition), border-color var(--transition);
+}
+
+.btn:hover {
+    background-color: var(--wine-light);
+    text-decoration: none;
+}
+
+.btn:active {
+    background-color: var(--wine-dark);
+}
+
+.btn-perigo {
+    border-color: #8B2A2A;
+    background-color: transparent;
+    color: #FFB3B3;
+}
+
+.btn-perigo:hover {
+    background-color: #8B2A2A;
+    color: white;
+}
 /* ---------- Acessibilidade ---------- */
 
 @media (prefers-reduced-motion: reduce) {
@@ -804,4 +931,19 @@ footer svg {
     * {
         transition: none !important;
     }
+}
+
+fieldset.rolavel {
+    max-height: 240px;
+    overflow-y: auto;
+}
+fieldset.rolavel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+fieldset.rolavel p {
+    text-align: center;
+    width: 100%;
 }
