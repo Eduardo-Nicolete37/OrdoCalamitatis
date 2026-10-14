@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict 7z2eGp7ORmBu9baKN4rj6Ceb64YBIGtw4jauEnb3lqSiK7hLLinbapAsCxWmL1C
+\restrict NbZPY7Qe5U9trRnnFuYfT0WS42vgncBTpfRweb09PS0Lb6tjA9Sv5fQhN40Dgxa
 
 -- Dumped from database version 18.6
 -- Dumped by pg_dump version 18.6
@@ -135,9 +135,13 @@ CREATE TABLE public.characters (
     class character varying(12) NOT NULL,
     nex integer NOT NULL,
     created_by integer,
-    CONSTRAINT chk_characters_attrs CHECK (((agi >= 0) AND (str >= 0) AND (intel >= 0) AND (pre >= 0) AND (vig >= 0))),
-    CONSTRAINT chk_characters_class CHECK (((class)::text = ANY ((ARRAY['Combatente'::character varying, 'Especialista'::character varying, 'Ocultista'::character varying])::text[]))),
-    CONSTRAINT chk_characters_nex CHECK (((nex >= 0) AND (nex <= 99)))
+    CONSTRAINT characters_agi_check CHECK ((agi >= 0)),
+    CONSTRAINT characters_class_check CHECK (((class)::text = ANY ((ARRAY['Combatente'::character varying, 'Especialista'::character varying, 'Ocultista'::character varying])::text[]))),
+    CONSTRAINT characters_intel_check CHECK ((intel >= 0)),
+    CONSTRAINT characters_nex_check CHECK (((nex >= 0) AND (nex <= 99))),
+    CONSTRAINT characters_pre_check CHECK ((pre >= 0)),
+    CONSTRAINT characters_str_check CHECK ((str >= 0)),
+    CONSTRAINT characters_vig_check CHECK ((vig >= 0))
 );
 
 
@@ -176,7 +180,7 @@ CREATE TABLE public.items (
     critical character varying(10),
     damage_type character varying(20),
     created_by integer,
-    CONSTRAINT chk_items_space CHECK ((space >= 0))
+    CONSTRAINT items_space_check CHECK ((space >= 0))
 );
 
 
@@ -288,7 +292,7 @@ CREATE TABLE public.rituals (
     pd_gasto integer NOT NULL,
     ritual_type character varying(255) NOT NULL,
     dano character varying(255),
-    effect character varying(255),
+    effect text,
     description text NOT NULL,
     created_by integer
 );
@@ -380,6 +384,7 @@ COPY public.character_items (id, character_id, item_id, quantity) FROM stdin;
 --
 
 COPY public.character_rituals (id, character_id, ritual_id) FROM stdin;
+1	1	2
 \.
 
 
@@ -388,12 +393,15 @@ COPY public.character_rituals (id, character_id, ritual_id) FROM stdin;
 --
 
 COPY public.character_skills (id, character_id, skill) FROM stdin;
-1	3	Ciências
-2	3	Intuição
-3	3	Investigação
-4	3	Pontaria
-5	3	Profissão
-6	3	Vontade
+1	1	Acrobacia
+2	1	Atletismo
+3	1	Fortitude
+4	1	Furtividade
+5	1	Iniciativa
+6	1	Luta
+7	1	Percepção
+8	1	Pontaria
+9	1	Reflexos
 \.
 
 
@@ -402,8 +410,7 @@ COPY public.character_skills (id, character_id, skill) FROM stdin;
 --
 
 COPY public.characters (id, name, img, agi, str, intel, pre, vig, occupation, history, personality, class, nex, created_by) FROM stdin;
-2	Joui Jouki	uploads/img_6ac80172b2d870.33286835.png	3	3	3	3	3	Atleta	qefwgnkwbgkjebkbekgbkjvbskbskbkjenv	Protetor, Impulsivo, Empático	Combatente	75	1
-3	Elizabeth Webber	uploads/img_6aca97d3e38f70.59725950.webp	3	1	5	0	3	Investigador	Elizabeth era uma médica e cientista forense, extremamente obstinada, inteligente e habilidosa, com uma obsessão por criar teorias e desvendar casos. Trabalhando com o seu parceiro detetive, Gustavo Dohmer, ajudou a resolver alguns casos para a Polícia Federal até que, finalmente, foi recrutada para a Ordo Realitas por Tristan Monteiro.\r\n\r\nDepois de perder quase toda sua equipe em sua primeira missão, acompanhou a Equipe E na investigação que levou à destruição de Santo Berço, onde ficou presa em um vórtice temporal por 22 anos. Após retornar a São Paulo, passou a seguir a pista de algo denominado "Ordem da Desconjuração".\r\n\r\nPosteriormente Liz investiga e acaba sendo capturada pelos Escriptas, um grupo relacionado à Desconjuração. Após ser resgatada por uma equipe da Ordem, Elizabeth foi emboscada pelo grupo ocultista novamente, sendo morta por Gal no 6º episódio de Desconjuração, quando o líder dos Escriptas enfia a katana de Joui Jouki no peito da agente, matando-a lentamente.[4]	Cético, Metódico, Frio e Calculista, Protetor, Paranoico	Especialista	50	1
+1	Joui Jouki	uploads/img_6ace76cc964c01.86370499.webp	3	3	1	1	3	Atleta	**Joui Jouki** foi um dos protagonistas da série Ordem Paranormal, presente em O Segredo na Floresta, Desconjuração e Calamidade.\r\n\r\nEle era um ginasta olímpico que, durante uma viagem para o Brasil junto de seus amigos, acabou sofrendo um ataque por uma criatura Paranormal, sendo salvo por Elizabeth Webber e Thiago Fritz.\r\n\r\nOs dois acabam virando seus mentores, e então Joui se junta à Ordo Realitas.\r\n\r\nJoui foi um dos membros designados para o Caso de Carpazinha, fazendo parte da Equipe E junto dos seus mentores.\r\n\r\nEle foi um dos sobreviventes da missão, mesmo ficando à beira da insanidade após ver a trágica cena do fim de Santo Berço.\r\n\r\nEle retornou em Ordem Paranormal: Desconjuração, tendo o objetivo de salvar Elizabeth Webber, que havia sido sequestrada por um misterioso grupo Ocultista chamado Escriptas.\r\n\r\nDurante a missão, Joui se torna o líder da Força D, porém, acaba fazendo um acordo com a Seita das Máscaras, juntando-se ao grupo com duas condições: parar Kian e manter seus companheiros seguros.\r\n\r\nJoui voltou posteriormente no 2º episódio de Calamidade, enraivecido e livre do controle da Seita das Máscaras após ser afetado pelo Ódio do Diabo, sendo responsável pelo assassinato de vários Escriptas na Mansão Leone enquanto estava fora de si.\r\n\r\nEle continuou junto com a Equipe Abutres na busca pelas Relíquias da Calamidade, sendo um dos Marcados do lado da Ordo Realitas.\r\n\r\nJoui Jouki foi morto por Kian durante a batalha do Coliseu, logo após provocá-lo e ser espancado até a morte.	Frio e Calculista, Protetor, Impulsivo, Vingativo, Paranoico	Combatente	70	1
 \.
 
 
@@ -412,7 +419,6 @@ COPY public.characters (id, name, img, agi, str, intel, pre, vig, occupation, hi
 --
 
 COPY public.items (id, name, img, type_item, damage, effect, item_range, prestige, description, category, space, critical, damage_type, created_by) FROM stdin;
-1	Fuzil de assalto (Calibre Grosso)	uploads/img_6aca99646e77c9.36755815.webp	Arma	2d10+2	Nenhum	Médio	2	É um fuzil militar robusto e visivelmente customizado. Ele possui o cano consideravelmente mais largo e o corpo reforçado com placas de metal extras para suportar o coice da arma. A coronha é mais grossa e emborrachada, feita para aguentar o recuo pesado dos projéteis enormes, que são quase do tamanho de um dedo. É uma arma pesada, intimidadora e feita para destruição bruta.	II	2	19/x3	Balístico	1
 \.
 
 
@@ -421,8 +427,7 @@ COPY public.items (id, name, img, type_item, damage, effect, item_range, prestig
 --
 
 COPY public.player_characters (id, player_id, character_id) FROM stdin;
-2	1	2
-3	17	3
+1	38	1
 \.
 
 
@@ -439,45 +444,46 @@ COPY public.player_temporadas (id, player_id, temporada_id) FROM stdin;
 --
 
 COPY public.players (id, name) FROM stdin;
-1	Luba
-2	Abelha
-3	Alanzoka
-4	Baghera Jones
-5	Bastet
-6	Beamom
-7	Bela Tiemiau
-8	Brino
-9	Calango
-10	Calígrafo
-11	Carol Zaghetti
-12	Cellbit
-13	Cereaw
-14	Cinemagrath
-15	Felps
-16	Foolish
-17	Gabi Cattuzzo
-18	Goularte
-19	Guaxinim
-20	Guilherme Lopes
-21	Guto Barbosa
-22	Jinki
-23	João Miranda
-24	João Victor Granja
-25	Kalera
-26	Karen Padrão
-27	Leo Santi
-28	LJoga
-29	Lorena Orsi
-30	Maethe
-31	Mount
-32	Murilo Choquetta
-33	Pac
-34	Quackity
-35	Rakin
-36	Roier
-37	T3ddy
-38	Triz Pariz
+1	Abelha
+2	Alanzoka
+3	Baghera Jones
+4	Bastet
+5	Beamom
+6	Bela Tiemiau
+7	Brino
+8	Calango
+9	Calígrafo
+10	Carol Zaghetti
+11	Cellbit
+12	Cereaw
+13	Cinemagrath
+14	Felps
+15	Foolish
+16	Gabi Cattuzzo
+17	Goularte
+18	Guaxinim
+19	Guilherme Lopes
+20	Guto Barbosa
+21	Jinki
+22	João Miranda
+23	João Victor Granja
+24	Kalera
+25	Karen Padrão
+26	Leo Santi
+27	LJoga
+28	Lorena Orsi
+29	Maethe
+30	Mount
+31	Murilo Choquetta
+32	Pac
+33	Quackity
+34	Rakin
+35	Roier
+36	T3ddy
+37	Triz Pariz
+38	Luba
 39	Zero
+40	Nenhuma das opções
 \.
 
 
@@ -486,7 +492,8 @@ COPY public.players (id, name) FROM stdin;
 --
 
 COPY public.rituals (id, name, img, element, pd_gasto, ritual_type, dano, effect, description, created_by) FROM stdin;
-1	Eletrocussão	uploads/img_6acac9274dc883.85571105.webp	Energia	1	1º Círculo	3d6	Você manifesta e dispara uma corrente elétrica contra o alvo.	Ritual que permite manifestar e disparar uma corrente elétrica contra um ser ou objeto, causando dano de Energia. O alvo pode realizar um teste de resistência de Fortitude para reduzir os efeitos.	1
+1	Ritual de Transcendência	uploads/img_6ace707ded9880.68485618.webp	Conhecimento	0	1º Círculo	0	Ao entrar em comunhão com o Outro Lado e suas entidades, seu usuário é fortalecido dependendo da exposição dele ao paranormal, sendo capaz de aprender um ritual no processo.	O primeiro ritual alguma vez criado, inventado pelo próprio Kian há aproximadamente 4000 anos.\r\n\r\nPara a realização desse ritual, basta ficar sobre o símbolo e se concentrar nele, carregando ou não um objeto amaldiçoado.\r\n\r\nEsse ritual é utilizado por todos os Ocultistas para se fortalecerem e aprenderem outros rituais ao se conectarem com o Outro Lado, compreendendo tudo e esquecendo a maior parte logo após o fim do ritual.\r\n\r\nCaso carregue um objeto amaldiçoado durante o ritual, o Outro Lado vai fazer uma pergunta em troca de uma fração de seu Conhecimento em forma de ritual. O ritual obtido varia de acordo com o objeto amaldiçoado carregado.\r\n\r\nCaso o indivíduo que transcenda seja um Marcado com 50% de exposição paranormal, ele se conectará mais fortemente com sua Marca, que poderá revelar alguma verdade para ele ou conectá-lo com um antigo Marcado que teve a mesma marca, que poderá lhe dizer algo.\r\n\r\nAtingir 50% de exposição paranormal também significa ser escolhido por uma das entidades do Outro Lado, podendo ter uma afinidade aos elementos de Sangue, Morte, Conhecimento e Energia.\r\n\r\nConjuração: Se concentrar no símbolo.\r\nUsuários: Pessoas com experiência paranormal suficiente para se conectar com o Outro Lado.	1
+2	Ritual de Envelhecimento Localizado	uploads/img_6ace756f659214.40529114.webp	Morte	4	1º Círculo	0	Base: Ao gastar 4 Pontos de Ocultismo, acelera o tempo de uma ferida do alvo, curando 1d6 de vida ou infeccionando ainda mais a ferida. (Não cura lesão grave) Intermediário: Acelera o tempo de 2 feridas do alvo, curando um total de 2d6+2 de vida ou infeccionando ainda mais a ferida. (Cura lesão grave)	Esse ritual consiste em segurar cinzas humanas em suas mãos e as assoprar sobre uma ferida, fazendo com que a cicatrização aconteça de forma extremamente acelerada, como demonstrada por Dante vista ao cicatrizar uma ferida no ombro de Beatrice que havia sido causada por uma flecha de Joui Jouki, ou ao acelerar o processo de cicatrização da queimadura de Kaiser. Esse ritual aparenta não ser capaz de curar doenças.\r\n\r\nConjuração: Ter em mãos cinzas humanas e assoprá-las.	1
 \.
 
 
@@ -518,35 +525,35 @@ SELECT pg_catalog.setval('public.character_items_id_seq', 1, false);
 -- Name: character_rituals_id_seq; Type: SEQUENCE SET; Schema: public; Owner: ordo
 --
 
-SELECT pg_catalog.setval('public.character_rituals_id_seq', 1, false);
+SELECT pg_catalog.setval('public.character_rituals_id_seq', 1, true);
 
 
 --
 -- Name: character_skills_id_seq; Type: SEQUENCE SET; Schema: public; Owner: ordo
 --
 
-SELECT pg_catalog.setval('public.character_skills_id_seq', 6, true);
+SELECT pg_catalog.setval('public.character_skills_id_seq', 9, true);
 
 
 --
 -- Name: characters_id_seq; Type: SEQUENCE SET; Schema: public; Owner: ordo
 --
 
-SELECT pg_catalog.setval('public.characters_id_seq', 3, true);
+SELECT pg_catalog.setval('public.characters_id_seq', 1, true);
 
 
 --
 -- Name: items_id_seq; Type: SEQUENCE SET; Schema: public; Owner: ordo
 --
 
-SELECT pg_catalog.setval('public.items_id_seq', 1, true);
+SELECT pg_catalog.setval('public.items_id_seq', 1, false);
 
 
 --
 -- Name: player_characters_id_seq; Type: SEQUENCE SET; Schema: public; Owner: ordo
 --
 
-SELECT pg_catalog.setval('public.player_characters_id_seq', 3, true);
+SELECT pg_catalog.setval('public.player_characters_id_seq', 1, true);
 
 
 --
@@ -560,14 +567,14 @@ SELECT pg_catalog.setval('public.player_temporadas_id_seq', 1, false);
 -- Name: players_id_seq; Type: SEQUENCE SET; Schema: public; Owner: ordo
 --
 
-SELECT pg_catalog.setval('public.players_id_seq', 39, true);
+SELECT pg_catalog.setval('public.players_id_seq', 40, true);
 
 
 --
 -- Name: rituals_id_seq; Type: SEQUENCE SET; Schema: public; Owner: ordo
 --
 
-SELECT pg_catalog.setval('public.rituals_id_seq', 1, true);
+SELECT pg_catalog.setval('public.rituals_id_seq', 2, true);
 
 
 --
@@ -893,5 +900,5 @@ ALTER TABLE ONLY public.rituals
 -- PostgreSQL database dump complete
 --
 
-\unrestrict 7z2eGp7ORmBu9baKN4rj6Ceb64YBIGtw4jauEnb3lqSiK7hLLinbapAsCxWmL1C
+\unrestrict NbZPY7Qe5U9trRnnFuYfT0WS42vgncBTpfRweb09PS0Lb6tjA9Sv5fQhN40Dgxa
 

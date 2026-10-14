@@ -65,7 +65,7 @@ CREATE TABLE rituals (
     pd_gasto     INTEGER NOT NULL,
     ritual_type  VARCHAR(255) NOT NULL, 
     dano         VARCHAR(255),
-    effect       VARCHAR(255),
+    effect       TEXT,
     description  TEXT NOT NULL,
     created_by   INTEGER REFERENCES userTabela(id) ON DELETE SET NULL
 );
