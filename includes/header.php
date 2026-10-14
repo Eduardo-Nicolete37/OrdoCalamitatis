@@ -27,9 +27,9 @@ if (isset($_SESSION['id'])){
     echo "<details>";
     echo "<summary>Administrador - " . $_SESSION['username'] . "</summary>";
     echo "<ul>";
-    echo "<li><a href='/OrdoCalamitatis/app/adm/new_char.php'>Novo Personagem</a></li>";
-    echo "<li><a href='/OrdoCalamitatis/app/adm/new_item.php'>Novo Item</a></li>";
-    echo "<li><a href='/OrdoCalamitatis/app/adm/new_ritual.php'>Novo Ritual</a></li>";
+    echo "<li><a href='/OrdoCalamitatis/app/adm/chars/new_char.php'>Novo Personagem</a></li>";
+    echo "<li><a href='/OrdoCalamitatis/app/adm/items/new_item.php'>Novo Item</a></li>";
+    echo "<li><a href='/OrdoCalamitatis/app/adm/rituals/new_ritual.php'>Novo Ritual</a></li>";
     echo "<li><a href='/OrdoCalamitatis/app/adm/creations.php'>Suas Criações</a></li>";
     echo "<li><a href='/OrdoCalamitatis/login/logout.php'>Log-Out</a></li>";
     echo "</ul>";
