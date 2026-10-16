@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://googleapis.com" rel="stylesheet">
-    <link rel="stylesheet" href="style/style.css">
+    <link rel="stylesheet" href="/OrdoCalamitatis/style/style.css">
     <title>Ordo Calamitatis</title>
 </head>
 <body>

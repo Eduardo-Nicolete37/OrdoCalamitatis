@@ -40,7 +40,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!in_array($category, $category_validos, true)) {
             throw new Exception("Categoria inválido.");
         }
-        criaItem($conexao, $name, $pathImage, $type_item, $damage, $damage_type, $critical, $item_range, $effect, $category, $space, $prestige, $description, $created_by, $character_id = null, $quantity = 1);
+        $character_id = $_POST['character_id'] ?? '';
+    $character_id = $character_id !== '' ? (int) $character_id : null;
+
+    $quantity = (int) ($_POST['quantity'] ?? 1);
+
+    if ($quantity < 1) {
+        throw new Exception("A quantidade deve ser pelo menos 1.");
+    }
+
+    if ($name === '') {
+        throw new Exception("O nome do item é obrigatório.");
+    }
+
+    if ($description === '') {
+        throw new Exception("A descrição é obrigatória.");
+    }
+    criaItem($conexao, $name, $pathImage, $type_item, $damage, $damage_type, $critical, $item_range, $effect, $category, $space, $prestige, $description, $created_by, $character_id, $quantity
+);
 
         header('Location: /OrdoCalamitatis/app/adm/creations.php');
         exit;

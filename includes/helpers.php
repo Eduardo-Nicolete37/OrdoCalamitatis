@@ -1,25 +1,7 @@
 <?php
 require_once __DIR__ . "/../database/connect.php";
 // Funções relacionadas a criação de personagens (CREATE)
-function criaPersonagem(
-    $conexao,
-    $player_id,
-    $name,
-    $foto,
-    $agi,
-    $str,
-    $intel,
-    $pre,
-    $vig,
-    $history,
-    $occupation,
-    $personality,
-    $class,
-    $nex,
-    $pericias,
-    $created_by,
-    $rituais = [],
-    $items = []
+function criaPersonagem($conexao, $player_id, $name, $foto, $agi, $str, $intel, $pre, $vig, $history, $occupation, $personality, $class, $nex, $pericias, $created_by, $rituais = [], $items = []
 ) {
     try {
         $conexao->beginTransaction();
@@ -237,6 +219,18 @@ function listaItems($conexao)
 {
     return $conexao->query("SELECT * FROM items ORDER BY name, id")->fetchAll(PDO::FETCH_ASSOC);
 }
+function readRituaisDoPersonagem($conexao, $id_char)
+{
+    $sql = "SELECT r.id, r.name, r.pd_gasto
+            FROM character_rituals cr
+            INNER JOIN rituals r ON r.id = cr.ritual_id
+            WHERE cr.character_id = :id
+            ORDER BY r.name";
+    $stmt = $conexao->prepare($sql);
+    $stmt->execute([':id' => $id_char]);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
 function readSpecificPersonagem($conexao, $id_user, $id_char)
 {
     $sql = "SELECT c.*,
@@ -251,7 +245,7 @@ function readSpecificPersonagem($conexao, $id_user, $id_char)
             FROM character_skills
             WHERE character_id = c.id) AS pericias,
 
-           (SELECT json_agg(json_build_object('name', i.name, 'quantity', ci.quantity) ORDER BY i.name)
+           (SELECT json_agg(json_build_object('id', i.id, 'name', i.name, 'quantity', ci.quantity) ORDER BY i.name)
             FROM character_items ci
             JOIN items i ON i.id = ci.item_id
             WHERE ci.character_id = c.id) AS itens,
@@ -308,6 +302,87 @@ function readSpecificItem($conexao, $id_user, $id_item)
 
     return $item;
 }
+// Funções relacionadas a atualização dos cadastros
+
+function updateCharacterADM($conexao, $id_char, $player_id, $name, $pathImage, $agi, $str, $intel, $pre, $vig, $history, $occupation, $personality, $class, $nex, $pericias = [], $rituais = [], $items = []) {
+    try {
+        $conexao->beginTransaction();
+
+        // 1. Atualiza os dados do personagem
+        $sql = "UPDATE characters SET 
+                    name = :name, 
+                    img = :img, 
+                    agi = :agi, 
+                    str = :str, 
+                    intel = :intel, 
+                    pre = :pre, 
+                    vig = :vig, 
+                    history = :history, 
+                    occupation = :occupation, 
+                    personality = :personality, 
+                    class = :class, 
+                    nex = :nex
+                WHERE id = :id";
+        
+        $stmt = $conexao->prepare($sql);
+        $stmt->execute([
+            ':id' => $id_char,
+            ':name' => $name,
+            ':img' => $pathImage, // Corrigido de $foto para $pathImage
+            ':agi' => $agi,
+            ':str' => $str,
+            ':intel' => $intel,
+            ':pre' => $pre,
+            ':vig' => $vig,
+            ':history' => $history,
+            ':occupation' => $occupation,
+            ':personality' => $personality,
+            ':class' => $class,
+            ':nex' => $nex,
+        ]);
+
+        // 2. Atualiza vínculo de jogador (Se como ADM você puder trocar quem é o dono do personagem)
+        if ($player_id !== null) {
+            $stmt = $conexao->prepare("UPDATE player_characters SET player_id = :p WHERE character_id = :c");
+            $stmt->execute([':p' => $player_id, ':c' => $id_char]);
+        }
+
+        // 3. Atualiza Perícias
+        $stmt = $conexao->prepare("DELETE FROM character_skills WHERE character_id = :c");
+        $stmt->execute([':c' => $id_char]);
+
+        $stmt = $conexao->prepare("INSERT INTO character_skills (character_id, skill) VALUES (:c, :s)");
+        foreach ($pericias as $skill) {
+            $stmt->execute([':c' => $id_char, ':s' => $skill]);
+        }
+
+        // 4. Atualiza Rituais
+        $stmt = $conexao->prepare("DELETE FROM character_rituals WHERE character_id = :c");
+        $stmt->execute([':c' => $id_char]);
+
+        $stmt = $conexao->prepare("INSERT INTO character_rituals (character_id, ritual_id) VALUES (:c, :r)");
+        foreach ($rituais as $ritual_id) {
+            $stmt->execute([':c' => $id_char, ':r' => $ritual_id]);
+        }
+
+        // 5. Atualiza Itens
+        $stmt = $conexao->prepare("DELETE FROM character_items WHERE character_id = :c");
+        $stmt->execute([':c' => $id_char]);
+
+        $stmt = $conexao->prepare("INSERT INTO character_items (character_id, items_id, quantity) VALUES (:c, :r, :q)");
+        foreach ($items as $item) {
+            $stmt->execute([':c' => $id_char, ':r' => $item['item_id'], ':q' => $item['quantity']]);
+        }
+
+        $conexao->commit();
+        return true;
+    } catch (Throwable $e) {
+        if ($conexao->inTransaction()) {
+            $conexao->rollBack();
+        }
+        throw $e;
+    }
+}
 
 // Funções relacionadas ao Login
 function consultaUser($conexao, $email)
@@ -315,8 +390,7 @@ function consultaUser($conexao, $email)
     try {
         $sql = "SELECT * FROM usertabela WHERE email = :email;"; // Definimos a função que será enviada ao SQL
         $stmt = $conexao->prepare($sql);
-        $stmt->bindParam(":email", $email); // O ID  que será procurado é enviado à database
-        $stmt->execute();
+        $stmt->execute(":email", $email); // O ID  que será procurado é enviado à database
 
         $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
         return $usuario;

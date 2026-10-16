@@ -4,17 +4,28 @@ require_once __DIR__ . "/../../../login/verifica_user.php";
 if (isset($_GET['id'])) {
     $id_char = $_GET['id'];
     $id_user = $_SESSION['id'];
+    $char = readSpecificPersonagem($conexao, $id_user, $id_char);
+    if (!$char) {
+        header("Location: creations.php");
+        exit;
+    }
     $tracos_selecionados = array_map(
         'trim',
         explode(',', $char['personality'] ?? '')
     );
-    $char = readSpecificPersonagem($conexao, $id_user, $id_char);
     $grupos_tracos = [
         'Racionais'  => ['Cético', 'Metódico', 'Frio e Calculista'],
         'Impulsivos' => ['Protetor', 'Impulsivo', 'Vingativo'],
         'Instáveis'  => ['Paranoico', 'Empático', 'Excêntrico'],
     ];
     $rituais_lista = listaRituais($conexao);
+    $rituais_marcados = array_map('intval', array_column(readRituaisDoPersonagem($conexao, $id_char), 'id'));
+    $rituais_por_circulo = [];
+    foreach ($rituais_lista as $r) {
+        $rituais_por_circulo[$r['ritual_type']][] = $r;
+    }
+    ksort($rituais_por_circulo); // Os menores valores de chave vêm primeiro (alfabética ou númerica)
+
     $items_lista = listaItems($conexao);
     $lista_pericias = [
         'Acrobacia',
@@ -47,6 +58,87 @@ if (isset($_GET['id'])) {
         'Vontade'
     ];
     $players = $conexao->query("SELECT id, name FROM players ORDER BY name")->fetchAll(PDO::FETCH_ASSOC);
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $pathImage = $char['img'];
+        try {
+            if (!isset($_FILES['foto'])) { // Se o user não quiser atualizar a foto, ele usa a versão anterior
+                $pathImage = downloadImage();
+            } else {
+                $pathImage = $char['img'];
+            }
+            $player_id = (int) ($_POST['player_id'] ?? 0);
+            if (!in_array($player_id, array_map('intval', array_column($players, 'id')), true)) {
+                throw new Exception("Jogador inválido.");
+            }
+
+            // O trim serve para 2 funções principais:
+            //  1. Remover espaços inúteis no começo e/ou fim do input
+            //  2. Para evitar o recebimento de mensagens somente com espaços, como '     '. O trim faz com que a string fique vazia, retornando a mensagem que o campo é obrigatório
+            // O ?? serve para usar o $_POST somente caso ele exista, senão enviar um espaço vazio, que vai retornar erro
+            $name       = trim($_POST['name'] ?? '');
+            $agi        = (int) ($_POST['agi'] ?? 0);
+            $str        = (int) ($_POST['str'] ?? 0);
+            $intel      = (int) ($_POST['intel'] ?? 0);
+            $pre        = (int) ($_POST['pre'] ?? 0);
+            $vig        = (int) ($_POST['vig'] ?? 0);
+            $occupation = trim($_POST['occupation'] ?? '');
+            $history    = trim($_POST['history'] ?? '');
+            $nex        = (int) ($_POST['nex'] ?? 0);
+
+            // Classe: só aceita valores da lista
+            $class = trim($_POST['class'] ?? '');
+            $classes_validas = ['Combatente', 'Especialista', 'Ocultista'];
+            if (!in_array($class, $classes_validas, true)) {
+                throw new Exception("Classe inválida.");
+            }
+
+            // Traços: filtra pelo permitido e junta em uma string
+            $tracos_validos = array_merge(...array_values($grupos_tracos));
+            $tracos = array_intersect($_POST['tracos'] ?? [], $tracos_validos);
+            if (empty($tracos)) {
+                throw new Exception("Selecione ao menos um traço de personalidade.");
+            }
+            $personality = implode(', ', $tracos);
+
+            $pericias = array_values(array_intersect($_POST['pericias'] ?? [], $lista_pericias));
+
+            $ids_rituais = array_map('intval', array_column($rituais_lista, 'id'));
+            $rituais = array_values(array_unique(array_intersect(array_map('intval', (array) ($_POST['rituais'] ?? [])), $ids_rituais)));
+            $ids_items = array_map('intval', array_column($items_lista, 'id'));
+            $items_selecionados = $_POST['items'] ?? [];
+
+            $items = [];
+
+            foreach ($items_selecionados as $item_id => $quantidade) {
+                $item_id = (int) $item_id;
+                $quantidade = (int) $quantidade;
+
+                if (in_array($item_id, $ids_items, true) && $quantidade > 0) {
+                    $items[] = ['item_id' => $item_id, 'quantity' => $quantidade];
+                }
+            }
+
+            if ($nex < 0 || $nex > 99) {
+                throw new Exception("NEX deve estar entre 0 e 99.");
+            }
+            $created_by = $_SESSION['id'];
+            updateCharacterADM($conexao, $id_char, $player_id, $name, $pathImage, $agi, $str, $intel, $pre, $vig, $history, $occupation, $personality, $class, $nex, $pericias, $rituais, $items);
+            if ($erro) {
+                echo $erro;
+            }
+            header('Location: /OrdoCalamitatis/app/adm/creations.php');
+            exit;
+        } catch (Exception $e) {
+            // Apaga a imagem enviada se algo falhou depois do upload
+            if ($pathImage) {
+                $arquivo = __DIR__ . '/../../../' . $pathImage;
+                if (is_file($arquivo)) {
+                    unlink($arquivo);
+                }
+            }
+            $erro = $e->getMessage();
+        }
+    }
 } else {
     header("Location: creations.php");
     exit;
@@ -72,7 +164,7 @@ if (isset($_GET['id'])) {
             <label for="name">Nome: </label>
             <input type="text" name="name" id="name" required placeholder="Fulano de Tal" value="<?php echo htmlspecialchars($char['name'] ?? '') ?>">
 
-            <label for="foto">Imagem:</label>
+            <label for="foto">Imagem (Se desejar não atualizar a imagem, não precisa enviar nada): </label>
             <input type="file" id="foto" name="foto" accept="image/*">
 
             <label for="agi">Agilidade: </label>
@@ -104,11 +196,11 @@ if (isset($_GET['id'])) {
                 <?php endforeach; ?>
             </select>
             <label for="class">Classe: </label>
-            <select name="class" id="class" required>
-                <option value="" disabled selected>Selecione...</option>
-                <option value="Combatente">Combatente</option>
-                <option value="Especialista">Especialista</option>
-                <option value="Ocultista">Ocultista</option>
+            <select name="class" id="class" required maxlength="255">
+                <option value="" disabled <?= empty($char['class']) ? 'selected' : '' ?>>Selecione...</option>
+                <option value="Combatente" <?= ($char['class'] ?? '') === 'Combatente' ? 'selected' : '' ?>>Combatente</option>
+                <option value="Especialista" <?= ($char['class'] ?? '') === 'Especialista' ? 'selected' : '' ?>>Especialista</option>
+                <option value="Ocultista" <?= ($char['class'] ?? '') === 'Ocultista' ? 'selected' : '' ?>>Ocultista</option>
             </select>
 
             <label for="occupation">Escolha ou digite a sua Origem (Passado):</label>
@@ -169,15 +261,25 @@ if (isset($_GET['id'])) {
             </fieldset>
 
             <fieldset class="rolavel">
-                <legend>Rituais dominados (opcional):</legend>
+                <legend>Rituais conhecidos:</legend>
+
                 <?php if (!$rituais_lista): ?>
-                    <p style="text-align: center; width: 100%;">Nenhum ritual cadastrado ainda.</p>
+                    <p>Nenhum ritual cadastrado ainda.</p>
                 <?php endif; ?>
-                <?php foreach ($rituais_lista as $r): ?>
-                    <label>
-                        <input type="checkbox" name="rituais[]" value="<?= (int) $r['id'] ?>">
-                        <?= htmlspecialchars($r['name']) ?>
-                    </label>
+
+                <?php foreach ($rituais_por_circulo as $circulo => $rituais_do_circulo): ?>
+                    <div class="grupo-tracos">
+                        <span class="grupo-titulo">
+                            <?= htmlspecialchars($circulo) ?>
+                        </span>
+
+                        <?php foreach ($rituais_do_circulo as $r): ?>
+                            <label>
+                                <input type="checkbox" name="rituais[]" value="<?= (int) $r['id'] ?>" <?= in_array((int) $r['id'], $rituais_marcados, true) ? 'checked' : '' ?>>
+                                <span><?= htmlspecialchars($r['name']) ?></span>
+                            </label>
+                        <?php endforeach; ?>
+                    </div>
                 <?php endforeach; ?>
             </fieldset>
             <fieldset class="rolavel">
@@ -188,17 +290,27 @@ if (isset($_GET['id'])) {
                 <?php endif; ?>
 
                 <?php foreach ($items_lista as $i): ?>
+                    <?php
+                    $quantidade_atual = 0;
+
+                    foreach ($char['itens'] ?? [] as $item_personagem) {
+                        if ((int) $item_personagem['id'] === (int) $i['id']) {
+                            $quantidade_atual = (int) $item_personagem['quantity'];
+                            break;
+                        }
+                    }
+                    ?>
+
                     <div class="item-personagem">
                         <label for="item_<?= (int) $i['id'] ?>">
                             <?= htmlspecialchars($i['name']) ?>
                         </label>
 
-                        <input
-                            type="number"
+                        <input type="number"
                             id="item_<?= (int) $i['id'] ?>"
                             name="items[<?= (int) $i['id'] ?>]"
                             min="0"
-                            value="0">
+                            value="<?= $quantidade_atual ?>">
                     </div>
                 <?php endforeach; ?>
             </fieldset>
@@ -206,12 +318,12 @@ if (isset($_GET['id'])) {
             <textarea name="history" id="history" required placeholder="Era uma vez..."><?= htmlspecialchars($char['history'] ?? '') ?></textarea>
 
             <label for="nex">NEX: </label>
-            <input type="number" name="nex" id="nex" required min="0" max="99" placeholder="99" value="<?= (int) ($char['nex'] ?? 0) ?>>
+            <input type="number" name="nex" id="nex" required min="0" max="99" placeholder="99" value="<?= (int)($char['nex'] ?? 0); ?>">
 
-            <input type=" submit" value="Enviar">
 
-            <?php var_dump($char); ?>
+            <input type="submit" value="Enviar">
         </form>
+        <?php var_dump($char);?>
     </main>
     <footer>
         <?php include_once __DIR__ . "/../../../includes/footer.php"; ?>
