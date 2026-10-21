@@ -195,6 +195,13 @@ function readPersonagens($conexao, $id_user)
     $stmt->execute();
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
+function readPersonagensAll($conexao)
+{
+    $sql = "SELECT * FROM characters ORDER BY id"; // Definimos a função que será enviada ao SQL
+    $stmt = $conexao->prepare($sql);
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
 function readItems($conexao, $id_user)
 {
     $sql = "SELECT id, name, img FROM items WHERE created_by = :id_user ORDER BY id"; // Definimos a função que será enviada ao SQL
@@ -203,11 +210,25 @@ function readItems($conexao, $id_user)
     $stmt->execute();
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
+function readItemsAll($conexao)
+{
+    $sql = "SELECT * FROM items ORDER BY id"; // Definimos a função que será enviada ao SQL
+    $stmt = $conexao->prepare($sql);
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
 function readRituals($conexao, $id_user)
 {
     $sql = "SELECT id, name, img FROM rituals WHERE created_by = :id_user ORDER BY id"; // Definimos a função que será enviada ao SQL
     $stmt = $conexao->prepare($sql);
     $stmt->bindParam(":id_user", $id_user);
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+function readRitualsAll($conexao)
+{
+    $sql = "SELECT * FROM rituals ORDER BY id"; // Definimos a função que será enviada ao SQL
+    $stmt = $conexao->prepare($sql);
     $stmt->execute();
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
@@ -231,64 +252,63 @@ function readRituaisDoPersonagem($conexao, $id_char)
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
-function readSpecificPersonagem($conexao, $id_user, $id_char)
+function readSpecificPersonagem($conexao, $id_char)
 {
     $sql = "SELECT c.*,
-               u.username AS criador,
-            (SELECT pc.player_id FROM player_characters pc WHERE pc.character_id = c.id LIMIT 1 ) AS player_id,
-            (SELECT json_agg(p.name ORDER BY p.name) -- json_agg é usado para juntar várias colunas num array só
-            FROM player_characters pc
-            JOIN players p ON p.id = pc.player_id
-            WHERE pc.character_id = c.id) AS players,
+                   u.username AS criador,
 
-            (SELECT json_agg(skill ORDER BY skill)
-            FROM character_skills
-            WHERE character_id = c.id) AS pericias,
+                   (SELECT pc.player_id FROM player_characters pc WHERE pc.character_id = c.id LIMIT 1) AS player_id,
 
-           (SELECT json_agg(json_build_object('id', i.id, 'name', i.name, 'quantity', ci.quantity) ORDER BY i.name)
-            FROM character_items ci
-            JOIN items i ON i.id = ci.item_id
-            WHERE ci.character_id = c.id) AS itens,
+                   (SELECT json_agg(p.name ORDER BY p.name) FROM player_characters pc JOIN players p ON p.id = pc.player_id WHERE pc.character_id = c.id) AS players,
 
-           (SELECT json_agg(r.name ORDER BY r.name)
-            FROM character_rituals cr
-            JOIN rituals r ON r.id = cr.ritual_id
-            WHERE cr.character_id = c.id) AS rituais
+                   (SELECT json_agg(skill ORDER BY skill) FROM character_skills WHERE character_id = c.id) AS pericias,
 
-        FROM characters c
-        LEFT JOIN userTabela u ON u.id = c.created_by
-        WHERE c.id = :id_char AND c.created_by = :id_user"; // Definimos a função que será enviada ao SQL
+                   (SELECT json_agg( json_build_object( 'id', i.id, 'name', i.name, 'quantity', ci.quantity ) ORDER BY i.name) FROM character_items ci JOIN items i ON i.id = ci.item_id WHERE ci.character_id = c.id) AS itens,
+
+                   (SELECT json_agg(
+                       json_build_object(
+                           'id', r.id,
+                           'name', r.name
+                       ) ORDER BY r.name
+                   ) FROM character_rituals cr JOIN rituals r ON r.id = cr.ritual_id WHERE cr.character_id = c.id) AS rituais
+
+            FROM characters c
+            LEFT JOIN userTabela u ON u.id = c.created_by
+            WHERE c.id = :id_char";
+
     $stmt = $conexao->prepare($sql);
+
     $stmt->execute([
-        ':id_user' => $id_user,
         ':id_char' => $id_char
     ]);
+
     $p = $stmt->fetch(PDO::FETCH_ASSOC);
+
     if (!$p) {
         return false;
     }
 
     foreach (['players', 'pericias', 'itens', 'rituais'] as $campo) {
-        $p[$campo] = json_decode($p[$campo] ?? '[]', true);
+        $dados = json_decode($p[$campo] ?? '[]', true);
+        $p[$campo] = is_array($dados) ? $dados : [];
     }
+
     $p['criador'] = $p['criador'] ?? 'desconhecido';
 
     return $p;
 }
 
-function readSpecificItem($conexao, $id_user, $id_item)
+function readSpecificItem($conexao, $id_item)
 {
     $sql = "SELECT i.*,
                    u.username AS criador
             FROM items i
             LEFT JOIN userTabela u ON u.id = i.created_by
-            WHERE i.id = :id_item
-              AND i.created_by = :id_user";
+            WHERE i.id = :id_item";
 
     $stmt = $conexao->prepare($sql);
 
     $stmt->execute([
-        ':id_user' => $id_user,
         ':id_item' => $id_item
     ]);
 
@@ -302,43 +322,43 @@ function readSpecificItem($conexao, $id_user, $id_item)
 
     return $item;
 }
+
+function readSpecificRitual($conexao, $id_ritual)
+{
+    $sql = "SELECT r.*,
+                   u.username AS criador
+            FROM rituals r
+            LEFT JOIN userTabela u ON u.id = r.created_by
+            WHERE r.id = :id_ritual";
+
+    $stmt = $conexao->prepare($sql);
+
+    $stmt->execute([
+        ':id_ritual' => $id_ritual
+    ]);
+
+    $ritual = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$ritual) {
+        return false;
+    }
+
+    $ritual['criador'] = $ritual['criador'] ?? 'desconhecido';
+
+    return $ritual;
+}
 // Funções relacionadas a atualização dos cadastros
 
-function updateCharacterADM($conexao, $id_char, $player_id, $name, $pathImage, $agi, $str, $intel, $pre, $vig, $history, $occupation, $personality, $class, $nex, $pericias = [], $rituais = [], $items = []) {
+function updateCharacterADM($conexao, $id_char, $player_id, $name, $pathImage, $agi, $str, $intel, $pre, $vig, $history, $occupation, $personality, $class, $nex, $pericias = [], $rituais = [], $items = [])
+{
     try {
         $conexao->beginTransaction();
 
         // 1. Atualiza os dados do personagem
-        $sql = "UPDATE characters SET 
-                    name = :name, 
-                    img = :img, 
-                    agi = :agi, 
-                    str = :str, 
-                    intel = :intel, 
-                    pre = :pre, 
-                    vig = :vig, 
-                    history = :history, 
-                    occupation = :occupation, 
-                    personality = :personality, 
-                    class = :class, 
-                    nex = :nex
-                WHERE id = :id";
-        
+        $sql = "UPDATE characters SET name = :name, img = :img, agi = :agi, str = :str, intel = :intel, pre = :pre, vig = :vig, history = :history, occupation = :occupation, personality = :personality, class = :class, nex = :nex WHERE id = :id";
+
         $stmt = $conexao->prepare($sql);
-        $stmt->execute([
-            ':id' => $id_char,
-            ':name' => $name,
-            ':img' => $pathImage, // Corrigido de $foto para $pathImage
-            ':agi' => $agi,
-            ':str' => $str,
-            ':intel' => $intel,
-            ':pre' => $pre,
-            ':vig' => $vig,
-            ':history' => $history,
-            ':occupation' => $occupation,
-            ':personality' => $personality,
-            ':class' => $class,
-            ':nex' => $nex,
+        $stmt->execute([ ':id' => $id_char, ':name' => $name, ':img' => $pathImage, ':agi' => $agi, ':str' => $str, ':intel' => $intel, ':pre' => $pre, ':vig' => $vig, ':history' => $history, ':occupation' => $occupation, ':personality' => $personality, ':class' => $class, ':nex' => $nex // Corrigido de $foto para $pathImage
         ]);
 
         // 2. Atualiza vínculo de jogador (Se como ADM você puder trocar quem é o dono do personagem)
@@ -366,12 +386,22 @@ function updateCharacterADM($conexao, $id_char, $player_id, $name, $pathImage, $
         }
 
         // 5. Atualiza Itens
-        $stmt = $conexao->prepare("DELETE FROM character_items WHERE character_id = :c");
+        $stmt = $conexao->prepare(
+            "DELETE FROM character_items WHERE character_id = :c"
+        );
         $stmt->execute([':c' => $id_char]);
 
-        $stmt = $conexao->prepare("INSERT INTO character_items (character_id, items_id, quantity) VALUES (:c, :r, :q)");
+        $stmt = $conexao->prepare(
+            "INSERT INTO character_items (character_id, item_id, quantity)
+     VALUES (:c, :i, :q)"
+        );
+
         foreach ($items as $item) {
-            $stmt->execute([':c' => $id_char, ':r' => $item['item_id'], ':q' => $item['quantity']]);
+            $stmt->execute([
+                ':c' => $id_char,
+                ':i' => $item['item_id'],
+                ':q' => $item['quantity']
+            ]);
         }
 
         $conexao->commit();
@@ -384,29 +414,146 @@ function updateCharacterADM($conexao, $id_char, $player_id, $name, $pathImage, $
     }
 }
 
+function updateItemADM($conexao,$id_item,$id_user,$name,$pathImage,$type_item,$damage,$damage_type,$critical,$item_range,$effect,$category,$space,$prestige,$description) {
+    try {
+        $conexao->beginTransaction();
+
+        // 1. Atualiza os dados do item
+        $sql = "UPDATE items SET name = :name, img = :img, type_item = :type_item, damage = :damage, damage_type = :damage_type, critical = :critical, item_range = :item_range, effect = :effect, category = :category, space = :space, prestige = :prestige, description = :description WHERE id = :id";
+
+        $stmt = $conexao->prepare($sql);
+
+        $stmt->execute([':id' => $id_item, ':name' => $name, ':img' => $pathImage, ':type_item' => $type_item, ':damage' => $damage, ':damage_type' => $damage_type, ':critical' => $critical, ':item_range' => $item_range, ':effect' => $effect, ':category' => $category, ':space' => $space, ':prestige' => $prestige, ':description' => $description
+        ]);
+
+        $conexao->commit();
+
+        return true;
+    } catch (Throwable $e) {
+        if ($conexao->inTransaction()) {
+            $conexao->rollBack();
+        }
+
+        throw $e;
+    }
+}
+
+function updateRitualADM($conexao, $id_ritual, $id_user, $name, $pathImage, $pd_gasto, $dano, $effect, $description, $element, $ritual_type) {
+    try {
+        $conexao->beginTransaction();
+
+        // 1. Atualiza os dados do ritual
+        $sql = "UPDATE rituals SET name = :name, img = :img, pd_gasto = :pd_gasto, dano = :dano, effect = :effect, description = :description, element = :element, ritual_type = :ritual_type WHERE id = :id_ritual AND created_by = :id_user";
+        $stmt = $conexao->prepare($sql);
+
+    $stmt->execute([':id_ritual'  => $id_ritual, ':id_user'    => $id_user, ':name'       => $name, ':img'        => $pathImage, ':pd_gasto'   => $pd_gasto, ':dano'       => $dano, ':effect'     => $effect, ':description'=> $description, ':element'    => $element, ':ritual_type'=> $ritual_type]);
+
+        $conexao->commit();
+
+        return true;
+    } catch (Throwable $e) {
+        if ($conexao->inTransaction()) {
+            $conexao->rollBack();
+        }
+
+        throw $e;
+    }
+}
+
+// Funções relacionadas a deletamento de registros
+
+
+function deleteCharADM($conexao, $id_char, $id_user) {
+    $sql = "SELECT img FROM characters WHERE id = :id AND created_by = :id_user";
+
+    $stmt = $conexao->prepare($sql);
+    $stmt->execute([':id' => $id_char, ':id_user' => $id_user]);
+
+    $char = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$char) {
+        return false;
+    }
+
+    $conexao->beginTransaction();
+
+    try {
+        $sql = "DELETE FROM characters
+                WHERE id = :id AND created_by = :id_user";
+
+        $stmt = $conexao->prepare($sql);
+        $stmt->execute([':id' => $id_char, ':id_user' => $id_user]);
+
+        if ($stmt->rowCount() === 0) {
+            $conexao->rollBack();
+            return false;
+        }
+
+        $conexao->commit();
+
+    } catch (Throwable $e) {
+        if ($conexao->inTransaction()) {
+            $conexao->rollBack();
+        }
+        throw $e;}
+
+    // Apaga a foto depois que o banco confirmar a exclusão
+    deleteImage($char['img']);
+    return true;
+}
+function deleteItemADM($conexao, $id_item, $id_user) {
+    $sql = "DELETE FROM items WHERE id = :id AND created_by = :id_user RETURNING img";
+    $stmt = $conexao->prepare($sql);
+    $stmt->execute([':id' => $id_item, ':id_user' => $id_user]);
+
+    $img = $stmt->fetchColumn();
+    if ($img === false) {
+        return false;
+    }
+
+    // Apaga a foto depois que o banco confirmar a exclusão
+    deleteImage($img);
+    return true;
+}
+function deleteRitualADM($conexao, $id_ritual, $id_user) {
+    $sql = "DELETE FROM rituals WHERE id = :id AND created_by = :id_user RETURNING img";
+    $stmt = $conexao->prepare($sql);
+    $stmt->execute([':id' => $id_ritual, ':id_user' => $id_user]);
+
+    $img = $stmt->fetchColumn();
+    if ($img === false) {
+        return false;
+    }
+
+    // Apaga a foto depois que o banco confirmar a exclusão
+    deleteImage($img);
+    return true;
+}
+
+
 // Funções relacionadas ao Login
 function consultaUser($conexao, $email)
 {
     try {
-        $sql = "SELECT * FROM usertabela WHERE email = :email;"; // Definimos a função que será enviada ao SQL
+        $sql = "SELECT * FROM usertabela WHERE email = :email";
         $stmt = $conexao->prepare($sql);
-        $stmt->execute(":email", $email); // O ID  que será procurado é enviado à database
+        $stmt->execute([':email' => $email]);
 
-        $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $usuario;
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     } catch (PDOException $e) {
-        if ($e->getCode() == '23502') { // Esse erro apita quando algum campo é enviado como null (Sendo que a coluna é NOT NULL)
+        if ($e->getCode() == '23502') { // Esse erro significa violação de restrição de não nulo
             echo "Preencha todos os campos obrigatórios!";
-        } elseif ($e->getCode() == '23514') {
-            echo "Email inválido! Tente novamente."; // Caso o email enviado vá contra o regex
+        } elseif ($e->getCode() == '23514') { // Esse erro significa que ocorreu violação de restrição de verificação
+            echo "Um dos campos viola uma regra de validação.";
         } else {
-
-            echo "Erro: " . $e->getMessage();
+            error_log($e->getMessage());
+            echo "Ocorreu um erro ao consultar o usuário.";
         }
+
         return false;
     }
-    echo '<br>' . "<a href='/mini_sistema'>Retorne aqui</a>";
 }
+
 
 function cadastraUser($conexao, $username, $email, $passwd)
 {
@@ -432,7 +579,7 @@ function cadastraUser($conexao, $username, $email, $passwd)
         }
     }
 }
-// Funções Relacionadas ao Download de imagens
+// Funções Relacionadas ao gerencialmento de imagens
 
 function downloadImage()
 {
@@ -489,4 +636,42 @@ function downloadImage()
 
     // Retorna o caminho relativo, que pode ser gravado no banco e usado no <img>
     return 'uploads/' . $novo_nome;
+}
+
+
+function deleteImage($caminhoImagem) {
+    if (empty($caminhoImagem)) {
+        return false;
+    }
+
+    // Caminho da pasta uploads, seguindo a estrutura de downloadImage()
+    $diretorioUploads = realpath(
+        __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'uploads'
+    );
+
+    if ($diretorioUploads === false) {
+        return false;
+    }
+
+    // Aceita somente caminhos relativos da pasta uploads
+    $nomeArquivo = basename($caminhoImagem);
+
+    if ($nomeArquivo === '.' || $nomeArquivo === '..') {
+        return false;
+    }
+
+    $caminhoCompleto = realpath(
+        $diretorioUploads . DIRECTORY_SEPARATOR . $nomeArquivo
+    );
+
+    // Garante que o arquivo está dentro de uploads
+    if (
+        $caminhoCompleto === false ||
+        !is_file($caminhoCompleto) ||
+        dirname($caminhoCompleto) !== $diretorioUploads
+    ) {
+        return false;
+    }
+
+    return unlink($caminhoCompleto);
 }
