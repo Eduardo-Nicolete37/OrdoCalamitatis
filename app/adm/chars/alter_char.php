@@ -1,14 +1,22 @@
 <?php
-require_once __DIR__ . "/../../../includes/helpers.php";
 require_once __DIR__ . "/../../../login/verifica_user.php";
-if (isset($_GET['id'])) {
-    $id_char = $_GET['id'];
-    $id_user = $_SESSION['id'];
-    $char = readSpecificPersonagem($conexao, $id_user, $id_char);
-    if (!$char) {
-        header("Location: creations.php");
-        exit;
-    }
+require_once __DIR__ . "/../../../includes/helpers.php";
+
+if (!isset($_GET['id']) || !ctype_digit((string) $_GET['id'])) { // o ctype_digit verifica se todos os caracteres de uma string são dígitos decimais
+    header("Location: /OrdoCalamitatis/app/adm/creations.php");
+    exit;
+}
+
+$id_char = (int) $_GET['id'];
+$id_user = (int) $_SESSION['id'];
+
+$char = readSpecificPersonagem($conexao, $id_char);
+
+if (!$char) {
+    header("Location: /OrdoCalamitatis/app/adm/creations.php");
+    exit;
+}
+    $player_id = (int) ($char['player_id'] ?? 0);
     $tracos_selecionados = array_map(
         'trim',
         explode(',', $char['personality'] ?? '')
@@ -27,48 +35,19 @@ if (isset($_GET['id'])) {
     ksort($rituais_por_circulo); // Os menores valores de chave vêm primeiro (alfabética ou númerica)
 
     $items_lista = listaItems($conexao);
-    $lista_pericias = [
-        'Acrobacia',
-        'Adestramento',
-        'Artes',
-        'Atletismo',
-        'Atualidades',
-        'Ciências',
-        'Crime',
-        'Diplomacia',
-        'Enganação',
-        'Fortitude',
-        'Furtividade',
-        'Iniciativa',
-        'Intimidação',
-        'Intuição',
-        'Investigação',
-        'Luta',
-        'Medicina',
-        'Ocultismo',
-        'Percepção',
-        'Pilotagem',
-        'Pontaria',
-        'Profissão',
-        'Reflexos',
-        'Religião',
-        'Sobrevivência',
-        'Tática',
-        'Tecnologia',
-        'Vontade'
-    ];
+    $lista_pericias = ['Acrobacia', 'Adestramento', 'Artes', 'Atletismo', 'Atualidades', 'Ciências', 'Crime', 'Diplomacia', 'Enganação', 'Fortitude', 'Furtividade', 'Iniciativa', 'Intimidação', 'Intuição', 'Investigação', 'Luta', 'Medicina', 'Ocultismo', 'Percepção', 'Pilotagem', 'Pontaria', 'Profissão', 'Reflexos', 'Religião', 'Sobrevivência', 'Tática', 'Tecnologia', 'Vontade'];
     $players = $conexao->query("SELECT id, name FROM players ORDER BY name")->fetchAll(PDO::FETCH_ASSOC);
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        $pathImage = $char['img'];
+        $player_id = (int) ($_POST['player_id'] ?? 0);
         try {
-            if (!isset($_FILES['foto'])) { // Se o user não quiser atualizar a foto, ele usa a versão anterior
+            $pathImage = $char['img'];
+
+            if (isset($_FILES['foto']) && $_FILES['foto']['error'] !== UPLOAD_ERR_NO_FILE) {
+                if ($_FILES['foto']['error'] !== UPLOAD_ERR_OK) {
+                    throw new Exception("Erro ao enviar a imagem.");
+                }
+
                 $pathImage = downloadImage();
-            } else {
-                $pathImage = $char['img'];
-            }
-            $player_id = (int) ($_POST['player_id'] ?? 0);
-            if (!in_array($player_id, array_map('intval', array_column($players, 'id')), true)) {
-                throw new Exception("Jogador inválido.");
             }
 
             // O trim serve para 2 funções principais:
@@ -99,7 +78,6 @@ if (isset($_GET['id'])) {
                 throw new Exception("Selecione ao menos um traço de personalidade.");
             }
             $personality = implode(', ', $tracos);
-
             $pericias = array_values(array_intersect($_POST['pericias'] ?? [], $lista_pericias));
 
             $ids_rituais = array_map('intval', array_column($rituais_lista, 'id'));
@@ -123,26 +101,13 @@ if (isset($_GET['id'])) {
             }
             $created_by = $_SESSION['id'];
             updateCharacterADM($conexao, $id_char, $player_id, $name, $pathImage, $agi, $str, $intel, $pre, $vig, $history, $occupation, $personality, $class, $nex, $pericias, $rituais, $items);
-            if ($erro) {
-                echo $erro;
-            }
-            header('Location: /OrdoCalamitatis/app/adm/creations.php');
+            header("Location: /OrdoCalamitatis/app/adm/creations.php");
             exit;
         } catch (Exception $e) {
-            // Apaga a imagem enviada se algo falhou depois do upload
-            if ($pathImage) {
-                $arquivo = __DIR__ . '/../../../' . $pathImage;
-                if (is_file($arquivo)) {
-                    unlink($arquivo);
-                }
-            }
             $erro = $e->getMessage();
+            echo $erro;
         }
-    }
-} else {
-    header("Location: creations.php");
-    exit;
-}
+    } 
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -151,13 +116,13 @@ if (isset($_GET['id'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/OrdoCalamitatis/style/style.css">
-    <title>Atualizar - <?php echo $char['name']; ?></title>
+    <title>Atualizar - <?= htmlspecialchars($char['name'] ?? '', ENT_QUOTES, 'UTF-8')?></title>
 </head>
 
 <body>
     <header>
         <?php include_once __DIR__ . "/../../../includes/header.php"; ?>
-        <h1>Atualize o <?php echo $char['name']; ?></h1>
+        <h1>Atualize o <?= htmlspecialchars($char['name'] ?? '', ENT_QUOTES, 'UTF-8') ?></h1>
     </header>
     <main>
         <form action="" method="post" class="create" enctype="multipart/form-data">
@@ -166,6 +131,14 @@ if (isset($_GET['id'])) {
 
             <label for="foto">Imagem (Se desejar não atualizar a imagem, não precisa enviar nada): </label>
             <input type="file" id="foto" name="foto" accept="image/*">
+
+            <label>Imagem atual:</label>
+            <img
+                class="ficha-foto"
+                src="/OrdoCalamitatis/<?= htmlspecialchars($char['img'], ENT_QUOTES, 'UTF-8') ?>"
+                alt="Imagem atual do Personagem"
+            >
+
 
             <label for="agi">Agilidade: </label>
             <input type="number" name="agi" id="agi" required min="0" placeholder="0" value="<?php echo (int)$char['agi'] ?>">
@@ -244,7 +217,14 @@ if (isset($_GET['id'])) {
                 <?php endforeach; ?>
             </fieldset>
 
-            <?php $pericias_marcadas = $char['pericias'] ?? []; ?>
+            <?php // Nesse trecho, no caso de algum erro ocorrer na desencriptação do JSON recebido, ele aceita JSON também
+            $pericias_marcadas = $char['pericias'] ?? [];
+            if (is_string($pericias_marcadas)) {
+                $pericias_marcadas = json_decode($pericias_marcadas, true) ?? [];
+            }
+            if (!is_array($pericias_marcadas)) {
+                $pericias_marcadas = [];
+            } ?>
             <fieldset>
                 <legend>Perícias treinadas:</legend>
 
@@ -321,9 +301,8 @@ if (isset($_GET['id'])) {
             <input type="number" name="nex" id="nex" required min="0" max="99" placeholder="99" value="<?= (int)($char['nex'] ?? 0); ?>">
 
 
-            <input type="submit" value="Enviar">
+            <input type="submit" value="Atualize personagem">
         </form>
-        <?php var_dump($char);?>
     </main>
     <footer>
         <?php include_once __DIR__ . "/../../../includes/footer.php"; ?>

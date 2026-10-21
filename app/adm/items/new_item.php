@@ -128,7 +128,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <input type="text" name="item_range" id="item_range" maxlength="255" placeholder="Curto">
 
             <label for="effect">Efeito: </label>
-            <input type="text" name="effect" id="effect" maxlength="255" placeholder="Causa sangramento">
+            <textarea name="effect" id="effect" required placeholder="Causa sangramento"></textarea>
 
             <label for="category">Categoria: </label>
             <select name="category" id="category">

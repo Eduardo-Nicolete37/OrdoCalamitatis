@@ -110,7 +110,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <input type="text" name="dano" id="dano" maxlength="255" placeholder="2d6">
 
             <label for="effect">Efeito: </label>
-            <input type="text" name="effect" id="effect" placeholder="Alvo fica amedrontado">
+            <textarea name="effect" id="effect" required placeholder="Alvo fica amedrontado"></textarea>
 
             <label for="description">Descrição: </label>
             <textarea name="description" id="description" required></textarea>

@@ -1,15 +1,23 @@
 <?php
-require_once __DIR__ . '\..\..\..\login\verifica_user.php';
-require_once __DIR__ . '\..\..\..\includes\helpers.php';
-if (isset($_GET['id'])) {
-    $id_char = $_GET['id'];
-    $id_user = $_SESSION['id'];
-    $char = readSpecificPersonagem($conexao, $id_user, $id_char);
-} else {
-    header("Location: creations.php");
+require_once __DIR__ . "/../../../login/verifica_user.php";
+require_once __DIR__ . "/../../../includes/helpers.php";
+
+if (!isset($_GET['id']) || !ctype_digit((string) $_GET['id'])) {
+    header("Location: /OrdoCalamitatis/app/adm/creations.php");
+    exit;
+}
+
+$id_char = (int) $_GET['id'];
+$id_user = (int) $_SESSION['id'];
+
+$char = readSpecificPersonagem($conexao, $id_user, $id_char);
+
+if (!$char) {
+    header("Location: /OrdoCalamitatis/app/adm/creations.php");
     exit;
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="pt-br">
 
@@ -97,10 +105,14 @@ if (isset($_GET['id'])) {
 
             <section>
                 <h2>Itens/Armas</h2>
-                <?php if ($char['itens']): ?>
+
+                <?php if (!empty($char['itens'])): ?>
                     <ul class="tags">
-                        <?php foreach ($char['itens'] as $itens): ?>
-                            <li><?= htmlspecialchars($itens) ?></li>
+                        <?php foreach ($char['itens'] as $item): ?>
+                            <li>
+                                <?= htmlspecialchars($item['name'] ?? '', ENT_QUOTES, 'UTF-8') ?>
+                                (Quantidade: <?= (int) ($item['quantity'] ?? 0) ?>)
+                            </li>
                         <?php endforeach; ?>
                     </ul>
                 <?php else: ?>
@@ -108,20 +120,27 @@ if (isset($_GET['id'])) {
                 <?php endif; ?>
             </section>
             <section>
-                <h2>Rituais</h2>
-                <?php if ($char['rituais']): ?>
-                    <ul class="tags">
-                        <?php foreach ($char['rituais'] as $rituais): ?>
-                            <li><?= htmlspecialchars($rituais) ?></li>
-                        <?php endforeach; ?>
-                    </ul>
-                <?php else: ?>
-                    <p>Nenhum ritual aprendido.</p>
-                <?php endif; ?>
-            </section>
+    <h2>Rituais</h2>
+
+    <?php if (!empty($char['rituais'])): ?>
+        <ul class="tags">
+            <?php foreach ($char['rituais'] as $ritual): ?>
+                <li>
+                    <?= htmlspecialchars(
+                        $ritual['name'] ?? 'Ritual sem nome',
+                        ENT_QUOTES,
+                        'UTF-8'
+                    ) ?>
+                </li>
+            <?php endforeach; ?>
+        </ul>
+    <?php else: ?>
+        <p>Nenhum ritual aprendido.</p>
+    <?php endif; ?>
+</section>
             <section class="acoes">
                 <a class="btn" href="/OrdoCalamitatis/app/adm/chars/alter_char.php?id=<?php echo (int)$id_char; ?>">Atualizar personagem</a>
-                <form method="post" action="/OrdoCalamitatis/app/adm/chars/dele_char.php?id=<?php echo (int)$id_char;?>"
+                <form method="post" action="/OrdoCalamitatis/app/adm/chars/dele_char.php?id=<?php echo (int)$id_char; ?>"
                     onsubmit="return confirm('Deletar este personagem? Essa ação não pode ser desfeita.');">
                     <input type="hidden" name="id" value="<?php echo (int)$id_char; ?>">
                     <button type="submit" class="btn btn-perigo">Deletar personagem</button>
