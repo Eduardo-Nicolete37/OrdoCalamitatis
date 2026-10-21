@@ -8,10 +8,10 @@
             <details>
                 <summary>Menu</summary>
                 <ul>
-                    <li><a href="/OrdoCalamitatis/app/user/rituals.php">Rituais</a></li>
-                    <li><a href="/OrdoCalamitatis/app/user/weapons.php">Armas</a></li>
+                    <li><a href="/OrdoCalamitatis/app/user/chars/charlist.php">Personagens</a></li>
+                    <li><a href="/OrdoCalamitatis/app/user/items/itemlist.php">Itens</a></li>
+                    <li><a href="/OrdoCalamitatis/app/user/rituals/rituallist.php">Rituais</a></li>
                     <li><a href="/OrdoCalamitatis/app/user/history.php">História</a></li>
-                    <li><a href="/OrdoCalamitatis/app/user/charlist.php">Personagens</a></li>
                     <li><a href="/OrdoCalamitatis/app/user/assests.php">Dossiês e Adicionais</a></li>
                 </ul>
             </details>
