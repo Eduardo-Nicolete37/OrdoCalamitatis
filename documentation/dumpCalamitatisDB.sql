@@ -2,10 +2,10 @@
 -- PostgreSQL database dump
 --
 
-\restrict 0KPLUfxhWU5aTGpRL9BgC1bX1Vb0P3CSj4ZLb6mHwSdWlVDcZqxxzGcEB2419KR
+\restrict lHz8ncfVKGory0ZAE2KGnW3HiUTgyOUfnaWbcM6jULYwDVdfdX3K1poMip30UZD
 
--- Dumped from database version 18.6 (Ubuntu 18.6-0ubuntu0.26.04.1)
--- Dumped by pg_dump version 18.6 (Ubuntu 18.6-0ubuntu0.26.04.1)
+-- Dumped from database version 18.6
+-- Dumped by pg_dump version 18.6
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -228,33 +228,6 @@ ALTER TABLE public.player_characters ALTER COLUMN id ADD GENERATED ALWAYS AS IDE
 
 
 --
--- Name: player_temporadas; Type: TABLE; Schema: public; Owner: ordo
---
-
-CREATE TABLE public.player_temporadas (
-    id integer NOT NULL,
-    player_id integer NOT NULL,
-    temporada_id integer NOT NULL
-);
-
-
-ALTER TABLE public.player_temporadas OWNER TO ordo;
-
---
--- Name: player_temporadas_id_seq; Type: SEQUENCE; Schema: public; Owner: ordo
---
-
-ALTER TABLE public.player_temporadas ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
-    SEQUENCE NAME public.player_temporadas_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1
-);
-
-
---
 -- Name: players; Type: TABLE; Schema: public; Owner: ordo
 --
 
@@ -315,35 +288,6 @@ ALTER TABLE public.rituals ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
 
 
 --
--- Name: temporadas; Type: TABLE; Schema: public; Owner: ordo
---
-
-CREATE TABLE public.temporadas (
-    id integer NOT NULL,
-    name character varying(255) NOT NULL,
-    ano_de_comeco integer NOT NULL,
-    ano_de_fim integer,
-    CONSTRAINT temporadas_check CHECK (((ano_de_fim IS NULL) OR (ano_de_fim >= ano_de_comeco)))
-);
-
-
-ALTER TABLE public.temporadas OWNER TO ordo;
-
---
--- Name: temporadas_id_seq; Type: SEQUENCE; Schema: public; Owner: ordo
---
-
-ALTER TABLE public.temporadas ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
-    SEQUENCE NAME public.temporadas_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1
-);
-
-
---
 -- Name: usertabela; Type: TABLE; Schema: public; Owner: ordo
 --
 
@@ -384,8 +328,8 @@ COPY public.character_items (id, character_id, item_id, quantity) FROM stdin;
 --
 
 COPY public.character_rituals (id, character_id, ritual_id) FROM stdin;
-1	1	2
-2	2	3
+14	1	2
+15	1	4
 \.
 
 
@@ -394,20 +338,17 @@ COPY public.character_rituals (id, character_id, ritual_id) FROM stdin;
 --
 
 COPY public.character_skills (id, character_id, skill) FROM stdin;
-1	1	Acrobacia
-2	1	Atletismo
-3	1	Fortitude
-4	1	Furtividade
-5	1	Iniciativa
-6	1	Luta
-7	1	Percepção
-8	1	Pontaria
-9	1	Reflexos
-10	2	Fortitude
-11	2	Luta
-12	2	Ocultismo
-13	2	Reflexos
-14	2	Vontade
+132	1	Acrobacia
+133	1	Atletismo
+134	1	Fortitude
+135	1	Furtividade
+136	1	Iniciativa
+137	1	Luta
+138	1	Ocultismo
+139	1	Percepção
+140	1	Pontaria
+141	1	Reflexos
+142	1	Sobrevivência
 \.
 
 
@@ -416,8 +357,7 @@ COPY public.character_skills (id, character_id, skill) FROM stdin;
 --
 
 COPY public.characters (id, name, img, agi, str, intel, pre, vig, occupation, history, personality, class, nex, created_by) FROM stdin;
-1	Joui Jouki	uploads/img_6ace76cc964c01.86370499.webp	3	3	1	1	3	Atleta	**Joui Jouki** foi um dos protagonistas da série Ordem Paranormal, presente em O Segredo na Floresta, Desconjuração e Calamidade.\r\n\r\nEle era um ginasta olímpico que, durante uma viagem para o Brasil junto de seus amigos, acabou sofrendo um ataque por uma criatura Paranormal, sendo salvo por Elizabeth Webber e Thiago Fritz.\r\n\r\nOs dois acabam virando seus mentores, e então Joui se junta à Ordo Realitas.\r\n\r\nJoui foi um dos membros designados para o Caso de Carpazinha, fazendo parte da Equipe E junto dos seus mentores.\r\n\r\nEle foi um dos sobreviventes da missão, mesmo ficando à beira da insanidade após ver a trágica cena do fim de Santo Berço.\r\n\r\nEle retornou em Ordem Paranormal: Desconjuração, tendo o objetivo de salvar Elizabeth Webber, que havia sido sequestrada por um misterioso grupo Ocultista chamado Escriptas.\r\n\r\nDurante a missão, Joui se torna o líder da Força D, porém, acaba fazendo um acordo com a Seita das Máscaras, juntando-se ao grupo com duas condições: parar Kian e manter seus companheiros seguros.\r\n\r\nJoui voltou posteriormente no 2º episódio de Calamidade, enraivecido e livre do controle da Seita das Máscaras após ser afetado pelo Ódio do Diabo, sendo responsável pelo assassinato de vários Escriptas na Mansão Leone enquanto estava fora de si.\r\n\r\nEle continuou junto com a Equipe Abutres na busca pelas Relíquias da Calamidade, sendo um dos Marcados do lado da Ordo Realitas.\r\n\r\nJoui Jouki foi morto por Kian durante a batalha do Coliseu, logo após provocá-lo e ser espancado até a morte.	Frio e Calculista, Protetor, Impulsivo, Vingativo, Paranoico	Combatente	70	1
-2	Amelie Florence	uploads/img_6acf85c9ef5448.94070269.webp	2	1	2	2	1	Acadêmico	Amelie Florence é uma das protagonistas da série Ordem Paranormal, presente em O Segredo na Ilha.\r\n\r\nEla é uma universitária, filha de Angelina e Montel Florence e irmã mais velha de Olivier Florence. Amelie, junto de sua família, viajou para a Ilha de Tipora devido ao trabalho de seu pai, que foi contratado para avaliar as obras de um pintor desaparecido que vivia na mansão onde os Florence ficariam. Lá, conheceu Bárbara Lima e Milo Castello, que se juntariam aos dois irmãos para desvendar os segredos da ilha.\r\n\r\nAmelie teve sua primeira aparição no 1º episódio de O Segredo na Ilha, ao ficar presa nas cordas do barco que a levava até Tipora, se recusando a aceitar a ajuda dos outros pra se soltar.	Impulsivo, Vingativo, Excêntrico	Ocultista	5	1
+1	Joui Jouki	uploads/img_6ad8a3461458c5.69552333.webp	3	3	1	1	3	Atleta	Joui Jouki foi um dos protagonistas da série Ordem Paranormal, presente em O Segredo na Floresta, Desconjuração e Calamidade.\r\n\r\nEle era um ginasta olímpico que, durante uma viagem para o Brasil junto de seus amigos, acabou sofrendo um ataque por uma criatura Paranormal, sendo salvo por Elizabeth Webber e Thiago Fritz.\r\n\r\nOs dois acabam virando seus mentores, e então Joui se junta à Ordo Realitas.\r\n\r\nJoui foi um dos membros designados para o Caso de Carpazinha, fazendo parte da Equipe E junto dos seus mentores.\r\n\r\nEle foi um dos sobreviventes da missão, mesmo ficando à beira da insanidade após ver a trágica cena do fim de Santo Berço.\r\n\r\nEle retornou em Ordem Paranormal: Desconjuração, tendo o objetivo de salvar Elizabeth Webber, que havia sido sequestrada por um misterioso grupo Ocultista chamado Escriptas.\r\n\r\nDurante a missão, Joui se torna o líder da Força D, porém, acaba fazendo um acordo com a Seita das Máscaras, juntando-se ao grupo com duas condições: parar Kian e manter seus companheiros seguros.\r\n\r\nJoui voltou posteriormente no 2º episódio de Calamidade, enraivecido e livre do controle da Seita das Máscaras após ser afetado pelo Ódio do Diabo, sendo responsável pelo assassinato de vários Escriptas na Mansão Leone enquanto estava fora de si.\r\n\r\nEle continuou junto com a Equipe Abutres na busca pelas Relíquias da Calamidade, sendo um dos Marcados do lado da Ordo Realitas.\r\n\r\nJoui Jouki foi morto por Kian durante a batalha do Coliseu, logo após provocá-lo e ser espancado até a morte.	Frio e Calculista, Protetor, Impulsivo, Vingativo, Paranoico	Combatente	70	1
 \.
 
 
@@ -426,7 +366,7 @@ COPY public.characters (id, name, img, agi, str, intel, pre, vig, occupation, hi
 --
 
 COPY public.items (id, name, img, type_item, damage, effect, item_range, prestige, description, category, space, critical, damage_type, created_by) FROM stdin;
-1	Arco e Flecha	uploads/img_6acfac3293b142.44424847.webp	Arma	1d6	Causa perfuração	Médio	0	O arco de Joui Jouki é um arco recurvo preto equipado com uma corda metálica e uma mira telescópica que possui uma pequena lanterna acoplada. Como marca registrada e detalhe sentimental, o equipamento traz uma fita rosa amarrada em uma de suas extremidades.	0	2	3X	Perfuração	1
+3	Pistola	uploads/img_6ad8cb0b50be80.47726085.webp	Arma	1d12	Causa perfuração	Curto/Médio	1	é uma arma de fogo de porte leve, semiautomática e de uso com apenas uma mão. No universo de Ordem Paranormal, ela é uma das ferramentas mais comuns e confiáveis da Ordem (Ordo Realitas), sendo a escolha ideal para agentes que buscam equilíbrio entre agilidade e precisão para enfrentar as ameaças do Outro Lado.	I	1	18	Balístico	1
 \.
 
 
@@ -436,15 +376,6 @@ COPY public.items (id, name, img, type_item, damage, effect, item_range, prestig
 
 COPY public.player_characters (id, player_id, character_id) FROM stdin;
 1	38	1
-2	5	2
-\.
-
-
---
--- Data for Name: player_temporadas; Type: TABLE DATA; Schema: public; Owner: ordo
---
-
-COPY public.player_temporadas (id, player_id, temporada_id) FROM stdin;
 \.
 
 
@@ -501,17 +432,9 @@ COPY public.players (id, name) FROM stdin;
 --
 
 COPY public.rituals (id, name, img, element, pd_gasto, ritual_type, dano, effect, description, created_by) FROM stdin;
-1	Ritual de Transcendência	uploads/img_6ace707ded9880.68485618.webp	Conhecimento	0	1º Círculo	0	Ao entrar em comunhão com o Outro Lado e suas entidades, seu usuário é fortalecido dependendo da exposição dele ao paranormal, sendo capaz de aprender um ritual no processo.	O primeiro ritual alguma vez criado, inventado pelo próprio Kian há aproximadamente 4000 anos.\r\n\r\nPara a realização desse ritual, basta ficar sobre o símbolo e se concentrar nele, carregando ou não um objeto amaldiçoado.\r\n\r\nEsse ritual é utilizado por todos os Ocultistas para se fortalecerem e aprenderem outros rituais ao se conectarem com o Outro Lado, compreendendo tudo e esquecendo a maior parte logo após o fim do ritual.\r\n\r\nCaso carregue um objeto amaldiçoado durante o ritual, o Outro Lado vai fazer uma pergunta em troca de uma fração de seu Conhecimento em forma de ritual. O ritual obtido varia de acordo com o objeto amaldiçoado carregado.\r\n\r\nCaso o indivíduo que transcenda seja um Marcado com 50% de exposição paranormal, ele se conectará mais fortemente com sua Marca, que poderá revelar alguma verdade para ele ou conectá-lo com um antigo Marcado que teve a mesma marca, que poderá lhe dizer algo.\r\n\r\nAtingir 50% de exposição paranormal também significa ser escolhido por uma das entidades do Outro Lado, podendo ter uma afinidade aos elementos de Sangue, Morte, Conhecimento e Energia.\r\n\r\nConjuração: Se concentrar no símbolo.\r\nUsuários: Pessoas com experiência paranormal suficiente para se conectar com o Outro Lado.	1
-2	Ritual de Envelhecimento Localizado	uploads/img_6ace756f659214.40529114.webp	Morte	4	1º Círculo	0	Base: Ao gastar 4 Pontos de Ocultismo, acelera o tempo de uma ferida do alvo, curando 1d6 de vida ou infeccionando ainda mais a ferida. (Não cura lesão grave) Intermediário: Acelera o tempo de 2 feridas do alvo, curando um total de 2d6+2 de vida ou infeccionando ainda mais a ferida. (Cura lesão grave)	Esse ritual consiste em segurar cinzas humanas em suas mãos e as assoprar sobre uma ferida, fazendo com que a cicatrização aconteça de forma extremamente acelerada, como demonstrada por Dante vista ao cicatrizar uma ferida no ombro de Beatrice que havia sido causada por uma flecha de Joui Jouki, ou ao acelerar o processo de cicatrização da queimadura de Kaiser. Esse ritual aparenta não ser capaz de curar doenças.\r\n\r\nConjuração: Ter em mãos cinzas humanas e assoprá-las.	1
 3	Decadência	uploads/img_6acf8816ac96f9.99334352.webp	Morte	6	1º Círculo	2d8 + 2	• Base: Requer toque físico e causa 2d8 + 2 de dano de Morte. • Intermediário: Permite imbuir o ritual em uma arma corpo a corpo. Ao desferir um ataque, o dano do ritual soma-se ao dano da arma no acerto. • Avançado: Eleva o círculo e aumenta o dano para 8d8 + 8, mudando o alcance para uma área de 6 metros que atinge múltiplos alvos.	Ao conjurar o Decadência, o conjurador manifesta uma espiral de fumaça cinzenta e poeira ao redor das mãos, acompanhada por uma súbita queda de temperatura e um odor de terra molhada.\r\nAo tocar o alvo, a energia paranormal drena sua vitalidade instantaneamente:\r\n• A pele murcha, resseca e acinzenta como pergaminho velho.\r\n• Os cabelos embranquecem ou caem no mesmo segundo.\r\n• O corpo sofre um envelhecimento acelerado, enfraquecendo os músculos e deixando o alvo debilitado pelo peso do tempo.	1
-\.
-
-
---
--- Data for Name: temporadas; Type: TABLE DATA; Schema: public; Owner: ordo
---
-
-COPY public.temporadas (id, name, ano_de_comeco, ano_de_fim) FROM stdin;
+2	Ritual de Envelhecimento Localizado	uploads/img_6ace756f659214.40529114.webp	Morte	4	1º Círculo	0	Base: Ao gastar 4 Pontos de Ocultismo, acelera o tempo de uma ferida do alvo, curando 1d6 de vida ou infeccionando ainda mais a ferida. (Não cura lesão grave) \r\nIntermediário: Acelera o tempo de 2 feridas do alvo, curando um total de 2d6+2 de vida ou infeccionando ainda mais a ferida. (Cura lesão grave)	Esse ritual consiste em segurar cinzas humanas em suas mãos e as assoprar sobre uma ferida, fazendo com que a cicatrização aconteça de forma extremamente acelerada, como demonstrada por Dante vista ao cicatrizar uma ferida no ombro de Beatrice que havia sido causada por uma flecha de Joui Jouki, ou ao acelerar o processo de cicatrização da queimadura de Kaiser. Esse ritual aparenta não ser capaz de curar doenças.\r\nConjuração: Ter em mãos cinzas humanas e assoprá-las.	1
+4	Ritual de Transcendência	uploads/img_6ad9033a9fbb68.84328081.webp	Morte	0	1º Círculo	0	Ao entrar em comunhão com o Outro Lado e suas entidades, seu usuário é fortalecido dependendo da exposição dele ao paranormal, sendo capaz de aprender um ritual no processo.	O primeiro ritual alguma vez criado, inventado pelo próprio Kian há aproximadamente 4000 anos.\r\n\r\nPara a realização desse ritual, basta ficar sobre o símbolo e se concentrar nele, carregando ou não um objeto amaldiçoado.\r\n\r\nEsse ritual é utilizado por todos os Ocultistas para se fortalecerem e aprenderem outros rituais ao se conectarem com o Outro Lado, compreendendo tudo e esquecendo a maior parte logo após o fim do ritual.\r\n\r\nCaso carregue um objeto amaldiçoado durante o ritual, o Outro Lado vai fazer uma pergunta em troca de uma fração de seu Conhecimento em forma de ritual. O ritual obtido varia de acordo com o objeto amaldiçoado carregado.\r\n\r\nCaso o indivíduo que transcenda seja um Marcado com 50% de exposição paranormal, ele se conectará mais fortemente com sua Marca, que poderá revelar alguma verdade para ele ou conectá-lo com um antigo Marcado que teve a mesma marca, que poderá lhe dizer algo.\r\n\r\nAtingir 50% de exposição paranormal também significa ser escolhido por uma das entidades do Outro Lado, podendo ter uma afinidade aos elementos de Sangue, Morte, Conhecimento e Energia.\r\n\r\nConjuração: Se concentrar no símbolo.\r\nUsuários: Pessoas com experiência paranormal suficiente para se conectar com o Outro Lado.	1
 \.
 
 
@@ -529,21 +452,21 @@ COPY public.usertabela (id, username, email, passwd) FROM stdin;
 -- Name: character_items_id_seq; Type: SEQUENCE SET; Schema: public; Owner: ordo
 --
 
-SELECT pg_catalog.setval('public.character_items_id_seq', 1, false);
+SELECT pg_catalog.setval('public.character_items_id_seq', 3, true);
 
 
 --
 -- Name: character_rituals_id_seq; Type: SEQUENCE SET; Schema: public; Owner: ordo
 --
 
-SELECT pg_catalog.setval('public.character_rituals_id_seq', 2, true);
+SELECT pg_catalog.setval('public.character_rituals_id_seq', 15, true);
 
 
 --
 -- Name: character_skills_id_seq; Type: SEQUENCE SET; Schema: public; Owner: ordo
 --
 
-SELECT pg_catalog.setval('public.character_skills_id_seq', 14, true);
+SELECT pg_catalog.setval('public.character_skills_id_seq', 142, true);
 
 
 --
@@ -557,7 +480,7 @@ SELECT pg_catalog.setval('public.characters_id_seq', 2, true);
 -- Name: items_id_seq; Type: SEQUENCE SET; Schema: public; Owner: ordo
 --
 
-SELECT pg_catalog.setval('public.items_id_seq', 1, true);
+SELECT pg_catalog.setval('public.items_id_seq', 3, true);
 
 
 --
@@ -565,13 +488,6 @@ SELECT pg_catalog.setval('public.items_id_seq', 1, true);
 --
 
 SELECT pg_catalog.setval('public.player_characters_id_seq', 2, true);
-
-
---
--- Name: player_temporadas_id_seq; Type: SEQUENCE SET; Schema: public; Owner: ordo
---
-
-SELECT pg_catalog.setval('public.player_temporadas_id_seq', 1, false);
 
 
 --
@@ -585,14 +501,7 @@ SELECT pg_catalog.setval('public.players_id_seq', 40, true);
 -- Name: rituals_id_seq; Type: SEQUENCE SET; Schema: public; Owner: ordo
 --
 
-SELECT pg_catalog.setval('public.rituals_id_seq', 3, true);
-
-
---
--- Name: temporadas_id_seq; Type: SEQUENCE SET; Schema: public; Owner: ordo
---
-
-SELECT pg_catalog.setval('public.temporadas_id_seq', 1, false);
+SELECT pg_catalog.setval('public.rituals_id_seq', 4, true);
 
 
 --
@@ -683,22 +592,6 @@ ALTER TABLE ONLY public.player_characters
 
 
 --
--- Name: player_temporadas player_temporadas_pkey; Type: CONSTRAINT; Schema: public; Owner: ordo
---
-
-ALTER TABLE ONLY public.player_temporadas
-    ADD CONSTRAINT player_temporadas_pkey PRIMARY KEY (id);
-
-
---
--- Name: player_temporadas player_temporadas_player_id_temporada_id_key; Type: CONSTRAINT; Schema: public; Owner: ordo
---
-
-ALTER TABLE ONLY public.player_temporadas
-    ADD CONSTRAINT player_temporadas_player_id_temporada_id_key UNIQUE (player_id, temporada_id);
-
-
---
 -- Name: players players_name_key; Type: CONSTRAINT; Schema: public; Owner: ordo
 --
 
@@ -720,22 +613,6 @@ ALTER TABLE ONLY public.players
 
 ALTER TABLE ONLY public.rituals
     ADD CONSTRAINT rituals_pkey PRIMARY KEY (id);
-
-
---
--- Name: temporadas temporadas_name_key; Type: CONSTRAINT; Schema: public; Owner: ordo
---
-
-ALTER TABLE ONLY public.temporadas
-    ADD CONSTRAINT temporadas_name_key UNIQUE (name);
-
-
---
--- Name: temporadas temporadas_pkey; Type: CONSTRAINT; Schema: public; Owner: ordo
---
-
-ALTER TABLE ONLY public.temporadas
-    ADD CONSTRAINT temporadas_pkey PRIMARY KEY (id);
 
 
 --
@@ -795,13 +672,6 @@ CREATE INDEX idx_items_created_by ON public.items USING btree (created_by);
 --
 
 CREATE INDEX idx_player_characters_character ON public.player_characters USING btree (character_id);
-
-
---
--- Name: idx_player_temporadas_temporada; Type: INDEX; Schema: public; Owner: ordo
---
-
-CREATE INDEX idx_player_temporadas_temporada ON public.player_temporadas USING btree (temporada_id);
 
 
 --
@@ -884,22 +754,6 @@ ALTER TABLE ONLY public.player_characters
 
 
 --
--- Name: player_temporadas player_temporadas_player_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ordo
---
-
-ALTER TABLE ONLY public.player_temporadas
-    ADD CONSTRAINT player_temporadas_player_id_fkey FOREIGN KEY (player_id) REFERENCES public.players(id) ON DELETE CASCADE;
-
-
---
--- Name: player_temporadas player_temporadas_temporada_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ordo
---
-
-ALTER TABLE ONLY public.player_temporadas
-    ADD CONSTRAINT player_temporadas_temporada_id_fkey FOREIGN KEY (temporada_id) REFERENCES public.temporadas(id) ON DELETE CASCADE;
-
-
---
 -- Name: rituals rituals_created_by_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ordo
 --
 
@@ -911,5 +765,5 @@ ALTER TABLE ONLY public.rituals
 -- PostgreSQL database dump complete
 --
 
-\unrestrict 0KPLUfxhWU5aTGpRL9BgC1bX1Vb0P3CSj4ZLb6mHwSdWlVDcZqxxzGcEB2419KR
+\unrestrict lHz8ncfVKGory0ZAE2KGnW3HiUTgyOUfnaWbcM6jULYwDVdfdX3K1poMip30UZD
 
