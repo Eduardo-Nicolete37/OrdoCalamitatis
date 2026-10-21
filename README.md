@@ -33,12 +33,10 @@ O sistema visa otimizar a pesquisa sobre essas temáticas e estruturar as criaç
   - [4.3. Regras de Negócio](#43-regras-de-negócio)
 - [5. Estrutura do Banco de Dados](#5-estrutura-do-banco-de-dados)
   - [Entidade: `userTabela`](#entidade-usertabela)
-  - [Entidade: `temporadas`](#entidade-temporadas)
   - [Entidade: `players`](#entidade-players)
   - [Entidade: `characters`](#entidade-characters)
   - [Entidade: `items`](#entidade-items)
   - [Entidade: `rituals`](#entidade-rituals)
-  - [Entidade: `player_temporadas`](#entidade-player_temporadas)
   - [Entidade: `player_characters`](#entidade-player_characters)
   - [Entidade: `character_rituals`](#entidade-character_rituals)
   - [Entidade: `character_items`](#entidade-character_items)
@@ -206,11 +204,11 @@ OrdoCalamitatis
 | **RF04** | Logout Seguro | Destruir sessão e limpar dados de autenticação | Alta | ✅ |
 | **RF05** | Criar Criações | O sistema deve fornecer formulários separados para Personagem, Item e Ritual | Alta | ✅ |
 | **RF06** | Listar Criações | O sistema deve exibir todas as criações do usuário | Alta | ✅ |
-| **RF07** | Editar Criações | O sistema deve permitir atualização de qualquer criação do próprio e somente do usuário | Alta | ⬜ |
-| **RF08** | Remover Criações | O sistema deve remover criações com confirmação de segurança | Alta | ⬜ |
-| **RF09** | Ver Detalhes | O sistema deve exibir informações completas de cada criação | Média | ⬜ |
+| **RF07** | Editar Criações | O sistema deve permitir atualização de qualquer criação do próprio e somente do usuário | Alta | ✅ |
+| **RF08** | Remover Criações | O sistema deve remover criações com confirmação de segurança | Alta | ✅ |
+| **RF09** | Ver Detalhes | O sistema deve exibir informações completas de cada criação | Média | ✅ |
 | **RF10** | Associar Item a Personagem | O sistema deve permitir que personagens possuam itens | Média | ✅ |
-| **RF11** | Associar Ritual a Personagem | O sistema deve permitir que personagens dominem rituais | Média | ⬜ |
+| **RF11** | Associar Ritual a Personagem | O sistema deve permitir que personagens dominem rituais | Média | ✅ |
 | **RF12** | Disponibilizar Livros de Referência | O sistema deve disponibilizar, em uma página separada, os livros do Mestre e do Player anexados ao projeto para consulta dos usuários. | Baixa | ✅ |
 
 
@@ -258,15 +256,6 @@ Conta de login do sistema. Não se confunde com `players`, que representa o joga
 CREATE DOMAIN typeEmail AS TEXT
 CHECK (VALUE ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$');
 ```
-
-### Entidade: `temporadas`
-
-| Campo | Tipo | Restrições | Descrição |
-|-------|------|-----------|-----------|
-| `id` | INTEGER | PRIMARY KEY GENERATED ALWAYS AS IDENTITY | Identificador único da temporada |
-| `name` | VARCHAR(255) | UNIQUE NOT NULL | Nome único da temporada |
-| `ano_de_comeco` | INTEGER | NOT NULL | Ano em que a temporada começou |
-| `ano_de_fim` | INTEGER | CHECK (ano_de_fim IS NULL OR ano_de_fim >= ano_de_comeco) | Ano de término da temporada. `NULL` indica que ainda está em andamento |
 
 ### Entidade: `players`
 
@@ -339,18 +328,6 @@ Jogador "de mesa", ou seja, a pessoa real que é dona de um ou mais personagens.
 * Índice em `created_by` para acelerar a listagem das criações de cada usuário.
 * O personagem que conhece o ritual é registrado em `character_rituals`.
 
-### Entidade: `player_temporadas`
-
-Tabela de conexão (N:N) entre jogadores e temporadas.
-
-| Campo | Tipo | Restrições | Descrição |
-|-------|------|-----------|-----------|
-| `id` | INTEGER | PRIMARY KEY GENERATED ALWAYS AS IDENTITY | Identificador único do vínculo |
-| `player_id` | INTEGER | NOT NULL FK → `players(id)` ON DELETE CASCADE | Jogador que participa da temporada |
-| `temporada_id` | INTEGER | NOT NULL FK → `temporadas(id)` ON DELETE CASCADE | Temporada da qual o jogador participa |
-
-* `UNIQUE (player_id, temporada_id)` impede registrar o mesmo jogador duas vezes na mesma temporada.
-* Índice em `temporada_id` para acelerar consultas por temporada.
 
 ### Entidade: `player_characters`
 
@@ -418,12 +395,6 @@ erDiagram
         typeEmail email "Unique/Not Null/Domínio específico"
         text passwd "Not Null"
     }
-    temporadas {
-        int id PK "Identity/Unique"
-        varchar(255) name "Unique/Not Null"
-        int ano_de_comeco "Not Null"
-        int ano_de_fim "Null / >= ano_de_comeco"
-    }
     players {
         int id PK "Identity/Unique"
         varchar(255) name "Unique/Not Null"
@@ -472,11 +443,6 @@ erDiagram
         text description "Not Null"
         int created_by FK "Null"
     }
-    player_temporadas {
-        int id PK
-        int player_id FK "Not Null"
-        int temporada_id FK "Not Null"
-    }
     player_characters {
         int id PK
         int player_id FK "Not Null"
@@ -499,8 +465,6 @@ erDiagram
         varchar(30) skill "Not Null"
     }
 
-    players ||--o{ player_temporadas : "tem"
-    temporadas ||--o{ player_temporadas : "inclui"
     players ||--o{ player_characters : "joga_com"
     characters ||--o{ player_characters : "usado_por"
     characters ||--o{ character_rituals : "conhece"
@@ -565,10 +529,6 @@ flowchart TD
 
 ---
 
-### Alta Fidelidade:
- - [Veja aqui - Figma](https://www.figma.com/design/UTbWf2dmiM2E0KfQ6hpcI6/Prot%C3%B3tipo---Ordo-Calamitatis?node-id=0-1&t=HHRskXJG7ZlVPTdt-1)
-
----
 
 ## 8. Contribuindo
 
@@ -585,8 +545,3 @@ flowchart TD
 - **Autor**: Eduardo Nicolete
 - **Email**: eduardonicolete79@gmail.com
 - **GitHub**: github.com/Eduardo-Nicolete37
-
-<!--
-$id = isset($_GET['id']) ? intval($_GET['id']) : 0;
-Para retirar o ID do personagem da URL
--->
