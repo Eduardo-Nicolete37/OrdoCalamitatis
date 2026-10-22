@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . "/../../../includes/helpers.php";
+session_start();
 
 if (!isset($_GET['id']) || !ctype_digit((string) $_GET['id'])) {
     header("Location: /OrdoCalamitatis/app/adm/creations.php");

@@ -10,7 +10,7 @@ if (!isset($_GET['id']) || !ctype_digit((string) $_GET['id'])) {
 $id_char = (int) $_GET['id'];
 $id_user = (int) $_SESSION['id'];
 
-$char = readSpecificPersonagem($conexao, $id_user, $id_char);
+$char = readSpecificPersonagem($conexao, $id_char);
 
 if (!$char) {
     header("Location: /OrdoCalamitatis/app/adm/creations.php");

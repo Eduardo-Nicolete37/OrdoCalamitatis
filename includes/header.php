@@ -1,6 +1,8 @@
 <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Special+Elite&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/OrdoCalamitatis/style/style.css">
-    <link href="https://googleapis.com" rel="stylesheet">
 </head>
 <nav aria-label="Menu principal">
     <div class="navConfig">
@@ -11,18 +13,17 @@
                     <li><a href="/OrdoCalamitatis/app/user/chars/charlist.php">Personagens</a></li>
                     <li><a href="/OrdoCalamitatis/app/user/items/itemlist.php">Itens</a></li>
                     <li><a href="/OrdoCalamitatis/app/user/rituals/rituallist.php">Rituais</a></li>
-                    <li><a href="/OrdoCalamitatis/app/user/history.php">História</a></li>
                     <li><a href="/OrdoCalamitatis/app/user/assests.php">Dossiês e Adicionais</a></li>
                 </ul>
             </details>
         </div>
         <div>
             <a href="/OrdoCalamitatis/" class="logo-navbar">
-                <img src="/OrdoCalamitatis/imgs/imgLogo.webp" alt="logo"> <!--Placeholder por agora-->
+                <img src="/OrdoCalamitatis/imgs/imgLogo.webp" alt="logo"> 
             </a>
         </div>
         <?php 
-if (isset($_SESSION['id'])){
+if (isset($_SESSION['id'])){ // O menu só aparece caso a sessão esteja começada e com o user logado, do contrário, aparece apenas o botão de login/cadastro
     echo "<div class='authLinks'>";
     echo "<details>";
     echo "<summary>Administrador - " . $_SESSION['username'] . "</summary>";

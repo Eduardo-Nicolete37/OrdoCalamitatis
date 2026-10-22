@@ -1,7 +1,25 @@
 <?php
 require_once __DIR__ . "/../database/connect.php";
 // Funções relacionadas a criação de personagens (CREATE)
-function criaPersonagem($conexao, $player_id, $name, $foto, $agi, $str, $intel, $pre, $vig, $history, $occupation, $personality, $class, $nex, $pericias, $created_by, $rituais = [], $items = []
+function criaPersonagem(
+    $conexao,
+    $player_id,
+    $name,
+    $foto,
+    $agi,
+    $str,
+    $intel,
+    $pre,
+    $vig,
+    $history,
+    $occupation,
+    $personality,
+    $class,
+    $nex,
+    $pericias,
+    $created_by,
+    $rituais = [],
+    $items = []
 ) {
     try {
         $conexao->beginTransaction();
@@ -38,7 +56,7 @@ function criaPersonagem($conexao, $player_id, $name, $foto, $agi, $str, $intel, 
         foreach ($rituais as $ritual_id) {
             $stmt->execute([':c' => $character_id, ':r' => $ritual_id]);
         }
-        $stmt = $conexao->prepare("INSERT INTO character_items (character_id, items_id, quantity) VALUES (:c, :r, :q)");
+        $stmt = $conexao->prepare("INSERT INTO character_items (character_id, item_id, quantity) VALUES (:c, :r, :q)");
         foreach ($items as $item) {
             $stmt->execute([':c' => $character_id, ':r' => $item['item_id'], ':q' => $item['quantity']]);
         }
@@ -254,27 +272,26 @@ function readRituaisDoPersonagem($conexao, $id_char)
 
 function readSpecificPersonagem($conexao, $id_char)
 {
-    $sql = "SELECT c.*,
-                   u.username AS criador,
+    $sql = "SELECT c.*, u.username AS criador,
 
-                   (SELECT pc.player_id FROM player_characters pc WHERE pc.character_id = c.id LIMIT 1) AS player_id,
+    (SELECT pc.player_id FROM player_characters pc WHERE pc.character_id = c.id LIMIT 1) AS player_id,
 
-                   (SELECT json_agg(p.name ORDER BY p.name) FROM player_characters pc JOIN players p ON p.id = pc.player_id WHERE pc.character_id = c.id) AS players,
+    (SELECT json_agg(p.name ORDER BY p.name) FROM player_characters pc JOIN players p ON p.id = pc.player_id WHERE pc.character_id = c.id) AS players,
 
-                   (SELECT json_agg(skill ORDER BY skill) FROM character_skills WHERE character_id = c.id) AS pericias,
+    (SELECT json_agg(skill ORDER BY skill) FROM character_skills WHERE character_id = c.id) AS pericias,
 
-                   (SELECT json_agg( json_build_object( 'id', i.id, 'name', i.name, 'quantity', ci.quantity ) ORDER BY i.name) FROM character_items ci JOIN items i ON i.id = ci.item_id WHERE ci.character_id = c.id) AS itens,
+    (SELECT json_agg( json_build_object( 'id', i.id, 'name', i.name, 'quantity', ci.quantity ) ORDER BY i.name) FROM character_items ci JOIN items i ON i.id = ci.item_id WHERE ci.character_id = c.id) AS itens,
 
-                   (SELECT json_agg(
-                       json_build_object(
-                           'id', r.id,
-                           'name', r.name
-                       ) ORDER BY r.name
-                   ) FROM character_rituals cr JOIN rituals r ON r.id = cr.ritual_id WHERE cr.character_id = c.id) AS rituais
-
-            FROM characters c
+    (SELECT json_agg( json_build_object('id', r.id, 'name', r.name) ORDER BY r.name ) FROM character_rituals cr JOIN rituals r ON r.id = cr.ritual_id WHERE cr.character_id = c.id) AS rituais
+        FROM characters c
             LEFT JOIN userTabela u ON u.id = c.created_by
             WHERE c.id = :id_char";
+
+    // json_agg() reúne os resultados de várias linhas em um único array JSON.
+    // É utilizado para retornar vários registros relacionados ao personagem, como suas perícias, itens e rituais, dentro de um único campo. Assim, evitamos precisar fazer várias consultas separadas ou lidar com várias linhas repetidas para o mesmo personagem.
+
+    //json_build_object() cria um objeto JSON a partir de pares de chave e valor.
+    //É utilizado para agrupar informações relacionadas de cada registro, como o ID, o nome e a quantidade de um item. Isso é necessário porque precisamos retornar esses dados juntos e manter a relação entre eles, permitindo recuperar cada informação separadamente no PHP.
 
     $stmt = $conexao->prepare($sql);
 
@@ -289,6 +306,7 @@ function readSpecificPersonagem($conexao, $id_char)
     }
 
     foreach (['players', 'pericias', 'itens', 'rituais'] as $campo) {
+        // json_decode() converte uma string JSON em dados PHP; o argumento true solicita um array associativo.
         $dados = json_decode($p[$campo] ?? '[]', true);
         $p[$campo] = is_array($dados) ? $dados : [];
     }
@@ -358,7 +376,20 @@ function updateCharacterADM($conexao, $id_char, $player_id, $name, $pathImage, $
         $sql = "UPDATE characters SET name = :name, img = :img, agi = :agi, str = :str, intel = :intel, pre = :pre, vig = :vig, history = :history, occupation = :occupation, personality = :personality, class = :class, nex = :nex WHERE id = :id";
 
         $stmt = $conexao->prepare($sql);
-        $stmt->execute([ ':id' => $id_char, ':name' => $name, ':img' => $pathImage, ':agi' => $agi, ':str' => $str, ':intel' => $intel, ':pre' => $pre, ':vig' => $vig, ':history' => $history, ':occupation' => $occupation, ':personality' => $personality, ':class' => $class, ':nex' => $nex // Corrigido de $foto para $pathImage
+        $stmt->execute([
+            ':id' => $id_char,
+            ':name' => $name,
+            ':img' => $pathImage,
+            ':agi' => $agi,
+            ':str' => $str,
+            ':intel' => $intel,
+            ':pre' => $pre,
+            ':vig' => $vig,
+            ':history' => $history,
+            ':occupation' => $occupation,
+            ':personality' => $personality,
+            ':class' => $class,
+            ':nex' => $nex // Corrigido de $foto para $pathImage
         ]);
 
         // 2. Atualiza vínculo de jogador (Se como ADM você puder trocar quem é o dono do personagem)
@@ -414,7 +445,8 @@ function updateCharacterADM($conexao, $id_char, $player_id, $name, $pathImage, $
     }
 }
 
-function updateItemADM($conexao,$id_item,$id_user,$name,$pathImage,$type_item,$damage,$damage_type,$critical,$item_range,$effect,$category,$space,$prestige,$description) {
+function updateItemADM($conexao, $id_item, $id_user, $name, $pathImage, $type_item, $damage, $damage_type, $critical, $item_range, $effect, $category, $space, $prestige, $description)
+{
     try {
         $conexao->beginTransaction();
 
@@ -423,7 +455,20 @@ function updateItemADM($conexao,$id_item,$id_user,$name,$pathImage,$type_item,$d
 
         $stmt = $conexao->prepare($sql);
 
-        $stmt->execute([':id' => $id_item, ':name' => $name, ':img' => $pathImage, ':type_item' => $type_item, ':damage' => $damage, ':damage_type' => $damage_type, ':critical' => $critical, ':item_range' => $item_range, ':effect' => $effect, ':category' => $category, ':space' => $space, ':prestige' => $prestige, ':description' => $description
+        $stmt->execute([
+            ':id' => $id_item,
+            ':name' => $name,
+            ':img' => $pathImage,
+            ':type_item' => $type_item,
+            ':damage' => $damage,
+            ':damage_type' => $damage_type,
+            ':critical' => $critical,
+            ':item_range' => $item_range,
+            ':effect' => $effect,
+            ':category' => $category,
+            ':space' => $space,
+            ':prestige' => $prestige,
+            ':description' => $description
         ]);
 
         $conexao->commit();
@@ -438,7 +483,8 @@ function updateItemADM($conexao,$id_item,$id_user,$name,$pathImage,$type_item,$d
     }
 }
 
-function updateRitualADM($conexao, $id_ritual, $id_user, $name, $pathImage, $pd_gasto, $dano, $effect, $description, $element, $ritual_type) {
+function updateRitualADM($conexao, $id_ritual, $id_user, $name, $pathImage, $pd_gasto, $dano, $effect, $description, $element, $ritual_type)
+{
     try {
         $conexao->beginTransaction();
 
@@ -446,7 +492,7 @@ function updateRitualADM($conexao, $id_ritual, $id_user, $name, $pathImage, $pd_
         $sql = "UPDATE rituals SET name = :name, img = :img, pd_gasto = :pd_gasto, dano = :dano, effect = :effect, description = :description, element = :element, ritual_type = :ritual_type WHERE id = :id_ritual AND created_by = :id_user";
         $stmt = $conexao->prepare($sql);
 
-    $stmt->execute([':id_ritual'  => $id_ritual, ':id_user'    => $id_user, ':name'       => $name, ':img'        => $pathImage, ':pd_gasto'   => $pd_gasto, ':dano'       => $dano, ':effect'     => $effect, ':description'=> $description, ':element'    => $element, ':ritual_type'=> $ritual_type]);
+        $stmt->execute([':id_ritual'  => $id_ritual, ':id_user'    => $id_user, ':name'       => $name, ':img'        => $pathImage, ':pd_gasto'   => $pd_gasto, ':dano'       => $dano, ':effect'     => $effect, ':description' => $description, ':element'    => $element, ':ritual_type' => $ritual_type]);
 
         $conexao->commit();
 
@@ -463,7 +509,8 @@ function updateRitualADM($conexao, $id_ritual, $id_user, $name, $pathImage, $pd_
 // Funções relacionadas a deletamento de registros
 
 
-function deleteCharADM($conexao, $id_char, $id_user) {
+function deleteCharADM($conexao, $id_char, $id_user)
+{
     $sql = "SELECT img FROM characters WHERE id = :id AND created_by = :id_user";
 
     $stmt = $conexao->prepare($sql);
@@ -490,18 +537,19 @@ function deleteCharADM($conexao, $id_char, $id_user) {
         }
 
         $conexao->commit();
-
     } catch (Throwable $e) {
         if ($conexao->inTransaction()) {
             $conexao->rollBack();
         }
-        throw $e;}
+        throw $e;
+    }
 
     // Apaga a foto depois que o banco confirmar a exclusão
     deleteImage($char['img']);
     return true;
 }
-function deleteItemADM($conexao, $id_item, $id_user) {
+function deleteItemADM($conexao, $id_item, $id_user)
+{
     $sql = "DELETE FROM items WHERE id = :id AND created_by = :id_user RETURNING img";
     $stmt = $conexao->prepare($sql);
     $stmt->execute([':id' => $id_item, ':id_user' => $id_user]);
@@ -515,7 +563,8 @@ function deleteItemADM($conexao, $id_item, $id_user) {
     deleteImage($img);
     return true;
 }
-function deleteRitualADM($conexao, $id_ritual, $id_user) {
+function deleteRitualADM($conexao, $id_ritual, $id_user)
+{
     $sql = "DELETE FROM rituals WHERE id = :id AND created_by = :id_user RETURNING img";
     $stmt = $conexao->prepare($sql);
     $stmt->execute([':id' => $id_ritual, ':id_user' => $id_user]);
@@ -639,7 +688,8 @@ function downloadImage()
 }
 
 
-function deleteImage($caminhoImagem) {
+function deleteImage($caminhoImagem)
+{
     if (empty($caminhoImagem)) {
         return false;
     }

@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../../../includes/helpers.php';
+session_start();
 $rituals_list = readRitualsAll($conexao);
 ?>
 <!DOCTYPE html>
@@ -19,7 +20,7 @@ $rituals_list = readRitualsAll($conexao);
     <main class=creations>
     <?php 
     if (count($rituals_list) > 0){
-                echo "<strong>Itens: </strong>";
+                echo "<strong>Rituais: </strong>";
                 echo '<hr>';
                 echo "<ol>";
                 foreach ($rituals_list as $i) {

@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../../../includes/helpers.php';
+session_start();
 $characters_list = readPersonagensAll($conexao);
 ?>
 <!DOCTYPE html>

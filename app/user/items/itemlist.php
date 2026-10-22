@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../../../includes/helpers.php';
+session_start();
 $itens_list = readItemsAll($conexao);
 ?>
 <!DOCTYPE html>
