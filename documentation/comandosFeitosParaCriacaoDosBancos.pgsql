@@ -1,11 +1,23 @@
 CREATE DOMAIN typeEmail AS TEXT
 CHECK (VALUE ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$'); 
--- O trecho "[A-Za-z0-9._%+-]" define que pode ser escrito qualquer coisa com esses caractéres
--- Já o trecho "+@[A-Za-z0-9.-]" diz que tem que ter um @, e pode ser qualquer coisa depois (@proton, @gmail, etc)
--- Por fim, o trecho "\.[A-Za-z]{2,}$')" define que tem que ter um ., se colocasse-mos só um ., significaria que qualquer coisa poderia ser colocada nesse local, e depois, pode ir qualquer coisa, porém, tem que ter mais de 1 caractere
+-- [A-Za-z0-9._%+-]+
+-- Exige um ou mais caracteres permitidos antes do @.
+-- Inclui letras, números, ponto, sublinhado, %, + e -.
+
+-- @
+-- Exige o símbolo @ separando o nome do usuário e o domínio.
+
+-- [A-Za-z0-9.-]+
+-- Exige um ou mais caracteres permitidos na parte anterior
+-- ao último ponto, como "gmail" ou "proton".
+
+-- \.[A-Za-z]{2,}$
+-- Exige um ponto literal, seguido de pelo menos duas letras
+-- até o final da string.
 
 CREATE TABLE userTabela (
-    id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY, -- Foi usado IDENTITY no lugar do SERIAL pois ele segue o padrão SQL e não permite sobrescrever o id manualmente (o SERIAL permite, não segue o padrão SQL, etc)
+    id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY, 
+    -- Gera os identificadores automaticamente e impede a inserção manual de valores, exceto em operações explicitamente autorizadas. É uma alternativa padronizada ao SERIAL.
     username VARCHAR(255) UNIQUE NOT NULL,
     email typeEmail UNIQUE NOT NULL,
     passwd TEXT NOT NULL);
@@ -39,7 +51,7 @@ CREATE TABLE items (
     img          VARCHAR(255) NOT NULL,
     type_item    VARCHAR(255) NOT NULL,
     damage       VARCHAR(255), -- Só armas têm dano, efeito e alcance, por isso aceitam NULL
-    effect       VARCHAR(255),
+    effect       TEXT,
     item_range   VARCHAR(255), 
     prestige     INTEGER NOT NULL DEFAULT 0,
     description  TEXT NOT NULL,
