@@ -5,11 +5,12 @@
 ![PHP](https://img.shields.io/badge/PHP-777BB4?style=for-the-badge&logo=php&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-000?style=for-the-badge&logo=postgresql) 
 ![Git](https://img.shields.io/badge/GIT-E44C30?style=for-the-badge&logo=git&logoColor=white) 
-![Figma](https://img.shields.io/badge/Figma-696969?style=for-the-badge&logo=figma&logoColor=figma) 
 ![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white) 
 ![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white)
 </div>
+
 <hr>
+
 Desenvolvida em PHP com banco de dados PostgreSQL, a Ordo Calamitatis é uma aplicação web voltada ao gerenciamento de personagens, itens e rituais — tanto oficiais quanto fan-mades — do RPG **Ordem Paranormal**. 
 
 O sistema visa otimizar a pesquisa sobre essas temáticas e estruturar as criações da comunidade. Para isso, a plataforma implementa operações essenciais de CRUD (Cadastro, Consulta, Atualização e Exclusão), garantindo uma integração robusta e persistente dos dados.
@@ -54,7 +55,7 @@ O sistema visa otimizar a pesquisa sobre essas temáticas e estruturar as criaç
 ## 2. Como Executar o Projeto Localmente
 Para rodar este projeto na sua máquina, será necessário ter instalado um ambiente de servidor local (PHP) e o banco de dados PostgreSQL.
 ### 2.1. Pré-Requisitos
-- PHP (v7.4 ou superior) habilitado com a extensão pdo_pgsql.
+- PHP (v8.5) habilitado com a extensão pdo_pgsql.
 - PostgreSQL instalado e a rodar na porta 5432.
 - Git instalado na máquina.
 ---
@@ -73,7 +74,7 @@ cd OrdoCalamitatis
 ---
 
 #### Passo 2: Configurar o Banco de Dados
-O projeto deve contar com um arquivo SQL dentro da pasta database, nela está toda as estrutura do Banco de Dados ultilizada pelo Backend. 
+O projeto deve contar com um arquivo SQL dentro da pasta database, nela está toda a estrutura do Banco de Dados ultilizada pelo Backend. 
 
 Siga os passos descritos abaixo para para recriar o banco no seu PostgreSQL:
 
@@ -95,10 +96,10 @@ ALTER DATABASE calamitatisdb OWNER TO ordo;
 \q
 ```
 
-5. Após transferirmos o Banco de Dados para o usuário *ordo*, abriremos a pasta *database*, e faça o seguinte comando para restaurar as tabelas e registros:
+5. Após transferirmos o Banco de Dados para o usuário *ordo*, abriremos a pasta *documentation*, e faça o seguinte comando para restaurar as tabelas e registros:
 ```bash
 # Caso você não tenha aberto a pasta, faça:
-cd database
+cd documentation/
 # Usamos o arquivo já existente para recuperar as estruturas
 psql -U ordo -h localhost -d calamitatisdb -f dumpCalamitatisDB.sql
 # Retornamos para a raiz
@@ -111,7 +112,7 @@ Pelo VSCode, abra o arquivo *connect.php* na pasta *database*, editando apenas u
 $host = "localhost"; # Não altere esse campo
 $dbname = "calamitatisdb"; # Não altere esse campo
 $user = "ordo"; # Não altere esse campo
-$password = "INSIRA SUA SENHA AQUI"; # Altere apenas esse campo
+$password = "SUA SENHA DO POSTGRES (ordo) AQUI"; # Altere apenas esse campo
 ```
 ---
 
@@ -123,70 +124,99 @@ cd OrdoCalamitatis
 # Caso você deseje rodar a aplicação localmente, execute o comando:
 php -S localhost:8000 
 ```
-Por fim, abra no seu navegador de preferencia, digite o URL *localhost:8000*, e aproveite a aplicação.
+Por fim, abra no seu navegador de preferência, digite o URL *localhost:8000*, e aproveite a aplicação.
 
 ---
 
-## 3. Estrutura de Diretórios (INCOMPLETO)
-<!--TODO: Comentar os arquivos
-✅⬜
--->
-```
-OrdoCalamitatis
-│   .gitignore
-│   index.php
-│   README.md
+## 3. Estrutura de Diretórios
+
+```bash
+OrdoCalamitatis/
 │
-├───app
-│   ├───adm
-│   │       creations.php
-│   │       new_char.php
-│   │       new_item.php
-│   │       new_ritual.php
+├── index.php                         # Página inicial do site
+├── README.md                         # Documentação principal do projeto
+│
+├── app/                              # Páginas e funcionalidades principais
+│   ├── adm/                          # Área administrativa para gerenciamento de conteúdo
+│   │   ├── creations.php             # Lista as criações cadastradas pelo administrador
+│   │   │
+│   │   ├── chars/                    # Gerenciamento administrativo de personagens
+│   │   │   ├── alter_char.php        # Formulário para editar personagens
+│   │   │   ├── char_adm.php          # Visualização administrativa de um personagem
+│   │   │   ├── dele_char.php         # Exclusão de personagens
+│   │   │   └── new_char.php          # Cadastro de novos personagens
+│   │   │
+│   │   ├── items/                    # Gerenciamento administrativo de itens
+│   │   │   ├── alter_item.php        # Formulário para editar itens
+│   │   │   ├── dele_item.php         # Exclusão de itens
+│   │   │   ├── items_adm.php         # Listagem administrativa de itens
+│   │   │   └── new_item.php          # Cadastro de novos itens
+│   │   │
+│   │   └── rituals/                  # Gerenciamento administrativo de rituais
+│   │       ├── alter_ritual.php      # Formulário para editar rituais
+│   │       ├── dele_ritual.php       # Exclusão de rituais
+│   │       ├── new_ritual.php        # Cadastro de novos rituais
+│   │       └── rituals_adm.php       # Listagem administrativa de rituais
 │   │
-│   └───user
-│           assests.php
-│           charlist.php
-│           history.php
-│           rituals.php
-│           weapons.php
+│   ├── user/                         # Páginas destinadas aos usuários
+│   │   ├── assests.php               # Página de recursos e materiais disponíveis
+│   │   │
+│   │   ├── chars/                    # Consulta de personagens
+│   │   │   ├── char.php              # Exibe os detalhes de um personagem
+│   │   │   └── charlist.php          # Lista os personagens cadastrados
+│   │   │
+│   │   ├── items/                    # Consulta de itens
+│   │   │   ├── item.php              # Exibe os detalhes de um item
+│   │   │   └── itemlist.php          # Lista os itens cadastrados
+│   │   │
+│   │   └── rituals/                  # Consulta de rituais
+│   │       ├── ritual.php            # Exibe os detalhes de um ritual
+│   │       └── rituallist.php        # Lista os rituais cadastrados
+│   │
+├── database/                         # Configuração e estrutura do banco de dados
+│   └── connect.php                   # Estabelece a conexão com o banco de dados
 │
-├───database
-│       connect.php
+├── documentation/                    # Documentação técnica e arquivos de apoio
+│   ├── BaixaFidelidade.excalidraw    # Protótipo de baixa fidelidade das interfaces
+│   ├── comandosFeitosParaCriacaoDosBancos.pgsql
+│   │                                 # Comandos SQL usados na criação dos bancos
+│   └── dumpCalamitatisDB.sql         # Exportação da estrutura e/ou dos dados do banco
 │
-├───documentation
-│       BaixaFidelidade.excalidraw
-│       BCD_modelation.md
-│       comandosFeitosParaCriacaoDosBancos.pgsql
-│       dumpCalamitatisDB.sql
+├── imgs/                             # Imagens utilizadas na identidade visual do site
+│   ├── image.webp                    # Imagem utilizada na interface
+│   ├── imageFirstPage.webp           # Imagem de destaque da página inicial
+│   ├── imgLogo.webp                  # Logotipo do OrdoCalamitatis
+│   └── logotipo-do-github.webp       # Imagem relacionada ao GitHub
 │
-├───includes
-│       footer.php
-│       header.php
-│       helpers.php
+├── includes/                         # Componentes reutilizáveis e funções auxiliares
+│   ├── footer.php                    # Rodapé compartilhado entre as páginas
+│   ├── header.php                    # Cabeçalho compartilhado entre as páginas
+│   └── helpers.php                   # Funções auxiliares, consultas e operações com o banco
 │
-├───login
-│       cadastrar.php
-│       login.php
-│       logout.php
-│       verifica_user.php
+├── login/                            # Autenticação e controle de sessão
+│   ├── cadastrar.php                 # Cadastro de usuários
+│   ├── login.php                     # Tela e processamento de login
+│   ├── logout.php                    # Encerramento da sessão do usuário
+│   └── verifica_user.php             # Verifica a sessão e o acesso do usuário
 │
-├───pdfs
-│       ArquivosSecretos01.pdf
-│       ArquivosSecretos02.pdf
-│       ArquivosSecretos03.pdf
-│       ArquivosSecretos04.pdf
-│       ArquivosSecretos05.pdf
-│       ArquivosSecretos06.pdf
-│       ArquivosSecretos07.pdf
-│       FichaDosAgentesEditavel.pdf
-│       ordem-paranormal-regras-book.pdf
-│       OrdemParanormal2Playtest.pdf
+├── pdfs/                             # Livros de regras, fichas e materiais em PDF
+│   ├── ArquivosSecretos01.pdf        # Material de referência — Arquivos Secretos 01
+│   ├── ArquivosSecretos02.pdf        # Material de referência — Arquivos Secretos 02
+│   ├── ArquivosSecretos03.pdf        # Material de referência — Arquivos Secretos 03
+│   ├── ArquivosSecretos04.pdf        # Material de referência — Arquivos Secretos 04
+│   ├── ArquivosSecretos05.pdf        # Material de referência — Arquivos Secretos 05
+│   ├── ArquivosSecretos06.pdf        # Material de referência — Arquivos Secretos 06
+│   ├── ArquivosSecretos07.pdf        # Material de referência — Arquivos Secretos 07
+│   ├── FichaDosAgentesEditavel.pdf   # Ficha editável dos agentes
+│   ├── ordem-paranormal-regras-book.pdf
+│   │                                 # Livro de regras de Ordem Paranormal
+│   └── OrdemParanormal2Playtest.pdf  # Material de playtest da segunda edição
 │
-├───style
-│       style.css
+├── style/                            # Estilos visuais do projeto
+│   └── style.css                     # Folha de estilos CSS do site
 │
-└───uploads
+└── uploads/                          # Imagens enviadas durante o uso do sistema
+
 ```
 
 ---
@@ -203,7 +233,7 @@ OrdoCalamitatis
 | **RF03** | Proteção de Rotas | Páginas de usuário devem redirecionar para login se não autenticado | Alta | ✅ |
 | **RF04** | Logout Seguro | Destruir sessão e limpar dados de autenticação | Alta | ✅ |
 | **RF05** | Criar Criações | O sistema deve fornecer formulários separados para Personagem, Item e Ritual | Alta | ✅ |
-| **RF06** | Listar Criações | O sistema deve exibir todas as criações do usuário | Alta | ✅ |
+| **RF06** | Listar Criações | O sistema deve exibir todas as criações do usuário e da comunidade | Alta | ✅ |
 | **RF07** | Editar Criações | O sistema deve permitir atualização de qualquer criação do próprio e somente do usuário | Alta | ✅ |
 | **RF08** | Remover Criações | O sistema deve remover criações com confirmação de segurança | Alta | ✅ |
 | **RF09** | Ver Detalhes | O sistema deve exibir informações completas de cada criação | Média | ✅ |
@@ -217,7 +247,7 @@ OrdoCalamitatis
 
 | ID | Título | Descrição | Prioridade | Feito? |
 |----|--------|-----------|------------|--------|
-| **RNF01** | Linguagem | Back-end desenvolvido em PHP 7.4+ | Alta | ✅ |
+| **RNF01** | Linguagem | Back-end desenvolvido em PHP 8.5 | Alta | ✅ |
 | **RNF02** | Banco de Dados | PostgreSQL 12+ | Alta | ✅ |
 | **RNF03** | Padrão CRUD | Separação clara de camadas (conexão, lógica, apresentação) | Alta | ✅ |
 | **RNF04** | Proteção SQL Injection | Todos os queries devem usar prepared statements | Alta | ✅ |
@@ -235,7 +265,6 @@ OrdoCalamitatis
 | **RN03** | Autenticação Obrigatória | Páginas de criações só acessíveis com sessão ativa |
 | **RN04** | Campos Obrigatórios | Nome é obrigatório para todas as criações |
 | **RN05** | Validação Email | Deve estar em formato válido (regex) |
-| **RN06** | Sem Duplicação M:M | Um personagem não pode ter o mesmo item 2x |
 
 ---
 ## 5. Estrutura do Banco de Dados
@@ -297,7 +326,7 @@ Jogador "de mesa", ou seja, a pessoa real que é dona de um ou mais personagens.
 | `img` | VARCHAR(255) | NOT NULL | Caminho relativo da imagem do item |
 | `type_item` | VARCHAR(255) | NOT NULL | Tipo do item (ex.: Arma, Proteção, Geral, Paranormal) |
 | `damage` | VARCHAR(255) | | Dano causado pelo item, em texto livre (ex.: "1d6"). `NULL` se não for arma |
-| `effect` | VARCHAR(255) | | Efeito resumido do item. `NULL` se não houver |
+| `effect` | TEXT | | Efeito resumido do item. `NULL` se não houver |
 | `item_range` | VARCHAR(255) | | Alcance do item (renomeado de `range` para evitar conflito com palavra do SQL). `NULL` se não for arma |
 | `prestige` | INTEGER | NOT NULL DEFAULT 0 | Valor de prestígio do item |
 | `description` | TEXT | NOT NULL | Descrição completa do item |
@@ -321,7 +350,7 @@ Jogador "de mesa", ou seja, a pessoa real que é dona de um ou mais personagens.
 | `pd_gasto` | INTEGER | NOT NULL | Custo em PD para conjurar o ritual |
 | `ritual_type` | VARCHAR(255) | NOT NULL | Tipo do ritual, como o círculo (renomeado de `type` para evitar confusão com palavra do SQL) |
 | `dano` | VARCHAR(255) | | Dano causado pelo ritual, em texto livre. `NULL` se não causar dano |
-| `effect` | VARCHAR(255) | | Efeito resumido do ritual. `NULL` se não houver |
+| `effect` | TEXT | | Efeito resumido do ritual. `NULL` se não houver |
 | `description` | TEXT | NOT NULL | Descrição completa do ritual |
 | `created_by` | INTEGER | FK → `userTabela(id)` ON DELETE SET NULL | Conta que criou o ritual. `NULL` em registros antigos ou se a conta for apagada |
 
@@ -390,91 +419,95 @@ Tabela de conexão entre personagens e as perícias em que eles são treinados. 
 ```mermaid
 erDiagram
     userTabela {
-        int id PK "Identity/Unique"
-        varchar(255) username "Unique/Not Null"
-        typeEmail email "Unique/Not Null/Domínio específico"
-        text passwd "Not Null"
-    }
-    players {
-        int id PK "Identity/Unique"
-        varchar(255) name "Unique/Not Null"
-    }
-    characters {
-        int id PK "Identity"
-        varchar(255) name "Not Null"
-        varchar(255) img "Not Null"
-        int agi "Not Null / >= 0"
-        int str "Not Null / >= 0"
-        int intel "Not Null / >= 0"
-        int pre "Not Null / >= 0"
-        int vig "Not Null / >= 0"
-        varchar(255) occupation "Not Null"
-        text history "Not Null"
-        varchar(255) personality "Not Null"
-        varchar(12) class "Not Null / 3 classes"
-        int nex "Not Null / 0 a 99"
-        int created_by FK "Null"
-    }
-    items {
-        int id PK "Identity"
-        varchar(255) name "Not Null"
-        varchar(255) img "Not Null"
-        varchar(255) type_item "Not Null"
-        varchar(255) damage "Null"
-        varchar(255) effect "Null"
-        varchar(255) item_range "Null"
-        int prestige "Default 0"
-        text description "Not Null"
-        varchar(3) category "Null"
-        int space "Default 1 / >= 0"
-        varchar(10) critical "Null"
-        varchar(20) damage_type "Null"
-        int created_by FK "Null"
-    }
-    rituals {
-        int id PK "Identity"
-        varchar(255) name "Not Null"
-        varchar(255) img "Not Null"
-        varchar(255) element "Not Null"
-        int pd_gasto "Not Null"
-        varchar(255) ritual_type "Not Null"
-        varchar(255) dano "Null"
-        varchar(255) effect "Null"
-        text description "Not Null"
-        int created_by FK "Null"
-    }
-    player_characters {
         int id PK
-        int player_id FK "Not Null"
-        int character_id FK "Not Null"
-    }
-    character_rituals {
-        int id PK
-        int character_id FK "Not Null"
-        int ritual_id FK "Not Null"
-    }
-    character_items {
-        int id PK
-        int character_id FK "Not Null"
-        int item_id FK "Not Null"
-        int quantity "Default 1 / > 0"
-    }
-    character_skills {
-        int id PK
-        int character_id FK "Not Null"
-        varchar(30) skill "Not Null"
+        varchar username UK "NOT NULL"
+        typeEmail email UK "NOT NULL"
+        text passwd "NOT NULL"
     }
 
-    players ||--o{ player_characters : "joga_com"
-    characters ||--o{ player_characters : "usado_por"
-    characters ||--o{ character_rituals : "conhece"
-    rituals ||--o{ character_rituals : "usado_em"
+    players {
+        int id PK
+        varchar name UK "NOT NULL"
+    }
+
+    characters {
+        int id PK
+        varchar name "NOT NULL"
+        varchar img "NOT NULL"
+        int agi "CHECK >= 0"
+        int str "CHECK >= 0"
+        int intel "CHECK >= 0"
+        int pre "CHECK >= 0"
+        int vig "CHECK >= 0"
+        varchar occupation
+        text history
+        varchar personality
+        varchar class "CHECK"
+        int nex "CHECK 0-99"
+        int created_by FK
+    }
+
+    items {
+        int id PK
+        varchar name "NOT NULL"
+        varchar img "NOT NULL"
+        varchar type_item "NOT NULL"
+        varchar damage
+        text effect
+        varchar item_range
+        int prestige "NOT NULL DEFAULT 0"
+        text description "NOT NULL"
+        varchar category
+        int space "DEFAULT 1 CHECK >= 0"
+        varchar critical
+        varchar damage_type
+        int created_by FK
+    }
+
+    rituals {
+        int id PK
+        varchar name "NOT NULL"
+        varchar img "NOT NULL"
+        varchar element "NOT NULL"
+        int pd_gasto "NOT NULL"
+        varchar ritual_type "NOT NULL"
+        varchar dano
+        text effect
+        text description "NOT NULL"
+        int created_by FK
+    }
+
+    player_characters {
+        int player_id PK, FK
+        int character_id PK, FK
+    }
+
+    character_skills {
+        int character_id PK, FK
+        varchar skill_name PK
+    }
+
+    character_items {
+        int character_id PK, FK
+        int item_id PK, FK
+        int quantity "CHECK > 0"
+    }
+
+    character_rituals {
+        int character_id PK, FK
+        int ritual_id PK, FK
+    }
+
+    userTabela o|--o{ characters : "cria"
+    userTabela o|--o{ items : "cria"
+    userTabela o|--o{ rituals : "cria"
+    players ||--o{ player_characters : "associa"
+    characters ||--o{ player_characters : "possui"
+    characters ||--o{ character_skills : "possui"
     characters ||--o{ character_items : "possui"
-    items ||--o{ character_items : "carregado_em"
-    characters ||--o{ character_skills : "treinado_em"
-    userTabela ||--o{ characters : "criou"
-    userTabela ||--o{ items : "criou"
-    userTabela ||--o{ rituals : "criou"
+    items ||--o{ character_items : "integra"
+    characters ||--o{ character_rituals : "possui"
+    rituals ||--o{ character_rituals : "integra"
 ```
 ### 6.2. Fluxo de Processo
 
