@@ -1,6 +1,6 @@
 <?php
+session_start();
 require_once __DIR__ . '/includes/helpers.php';
-require_once __DIR__ . '/login/verifica_user.php';
 
 $chars_list = readPersonagensAll($conexao);
 $items_list = readItemsAll($conexao);
@@ -40,9 +40,7 @@ $rituals_destaque = array_slice($rituals_list, 0, 3);
                 <h1>Ordo<br>Calamitatis</h1>
 
                 <p>
-                    Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-                    Descubra personagens, rituais, armas e histórias do universo
-                    de Ordem Paranormal.
+                    O Ordo Calamitatis é uma plataforma desenvolvida para facilitar a criação e o gerenciamento de conteúdos de RPG, inspirada no universo de Ordem Paranormal. Com ela, você pode criar e personalizar personagens, organizar seus itens e cadastrar rituais, mantendo todas as informações reunidas em um só lugar. Explore as possibilidades, prepare suas fichas e organize cada detalhe da sua campanha para estar pronto para os mistérios e perigos que aguardam do outro lado da realidade.
                 </p>
             </div>
         </section>
