@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict lHz8ncfVKGory0ZAE2KGnW3HiUTgyOUfnaWbcM6jULYwDVdfdX3K1poMip30UZD
+\restrict LAJFJlBwRTx3K0nvp8Mc7MKAoNyJYZSUajUX9kAnMTjqZeXK1Hf2PAv3EEYPZgD
 
 -- Dumped from database version 18.6
 -- Dumped by pg_dump version 18.6
@@ -171,7 +171,7 @@ CREATE TABLE public.items (
     img character varying(255) NOT NULL,
     type_item character varying(255) NOT NULL,
     damage character varying(255),
-    effect character varying(255),
+    effect text,
     item_range character varying(255),
     prestige integer DEFAULT 0 NOT NULL,
     description text NOT NULL,
@@ -320,6 +320,10 @@ ALTER TABLE public.usertabela ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
 --
 
 COPY public.character_items (id, character_id, item_id, quantity) FROM stdin;
+4	1	3	1
+5	1	5	1
+6	4	3	1
+7	5	3	1
 \.
 
 
@@ -328,8 +332,10 @@ COPY public.character_items (id, character_id, item_id, quantity) FROM stdin;
 --
 
 COPY public.character_rituals (id, character_id, ritual_id) FROM stdin;
-14	1	2
-15	1	4
+16	1	2
+17	1	4
+19	4	4
+20	5	4
 \.
 
 
@@ -338,17 +344,39 @@ COPY public.character_rituals (id, character_id, ritual_id) FROM stdin;
 --
 
 COPY public.character_skills (id, character_id, skill) FROM stdin;
-132	1	Acrobacia
-133	1	Atletismo
-134	1	Fortitude
-135	1	Furtividade
-136	1	Iniciativa
-137	1	Luta
-138	1	Ocultismo
-139	1	Percepção
-140	1	Pontaria
-141	1	Reflexos
-142	1	Sobrevivência
+143	1	Acrobacia
+144	1	Atletismo
+145	1	Fortitude
+146	1	Furtividade
+147	1	Iniciativa
+148	1	Luta
+149	1	Ocultismo
+150	1	Percepção
+151	1	Pontaria
+152	1	Reflexos
+153	1	Sobrevivência
+166	4	Artes
+167	4	Diplomacia
+168	4	Enganação
+169	4	Fortitude
+170	4	Furtividade
+171	4	Intuição
+172	4	Investigação
+173	4	Ocultismo
+174	4	Pilotagem
+175	4	Pontaria
+176	4	Reflexos
+177	4	Vontade
+178	5	Atualidades
+179	5	Iniciativa
+180	5	Investigação
+181	5	Ocultismo
+182	5	Percepção
+183	5	Pontaria
+184	5	Reflexos
+185	5	Tática
+186	5	Tecnologia
+187	5	Vontade
 \.
 
 
@@ -358,6 +386,8 @@ COPY public.character_skills (id, character_id, skill) FROM stdin;
 
 COPY public.characters (id, name, img, agi, str, intel, pre, vig, occupation, history, personality, class, nex, created_by) FROM stdin;
 1	Joui Jouki	uploads/img_6ad8a3461458c5.69552333.webp	3	3	1	1	3	Atleta	Joui Jouki foi um dos protagonistas da série Ordem Paranormal, presente em O Segredo na Floresta, Desconjuração e Calamidade.\r\n\r\nEle era um ginasta olímpico que, durante uma viagem para o Brasil junto de seus amigos, acabou sofrendo um ataque por uma criatura Paranormal, sendo salvo por Elizabeth Webber e Thiago Fritz.\r\n\r\nOs dois acabam virando seus mentores, e então Joui se junta à Ordo Realitas.\r\n\r\nJoui foi um dos membros designados para o Caso de Carpazinha, fazendo parte da Equipe E junto dos seus mentores.\r\n\r\nEle foi um dos sobreviventes da missão, mesmo ficando à beira da insanidade após ver a trágica cena do fim de Santo Berço.\r\n\r\nEle retornou em Ordem Paranormal: Desconjuração, tendo o objetivo de salvar Elizabeth Webber, que havia sido sequestrada por um misterioso grupo Ocultista chamado Escriptas.\r\n\r\nDurante a missão, Joui se torna o líder da Força D, porém, acaba fazendo um acordo com a Seita das Máscaras, juntando-se ao grupo com duas condições: parar Kian e manter seus companheiros seguros.\r\n\r\nJoui voltou posteriormente no 2º episódio de Calamidade, enraivecido e livre do controle da Seita das Máscaras após ser afetado pelo Ódio do Diabo, sendo responsável pelo assassinato de vários Escriptas na Mansão Leone enquanto estava fora de si.\r\n\r\nEle continuou junto com a Equipe Abutres na busca pelas Relíquias da Calamidade, sendo um dos Marcados do lado da Ordo Realitas.\r\n\r\nJoui Jouki foi morto por Kian durante a batalha do Coliseu, logo após provocá-lo e ser espancado até a morte.	Frio e Calculista, Protetor, Impulsivo, Vingativo, Paranoico	Combatente	70	1
+4	Arthur Cervero	uploads/img_6ada7490d91e23.37588955.webp	4	2	3	1	1	Artista	Arthur Cervero é um dos protagonistas da série Ordem Paranormal, presente em O Segredo na Floresta, Desconjuração, Calamidade, O Segredo na Ilha e Hexatombe.\r\n\r\nEle era um músico e membro da gangue de motoqueiros Gaudérios Abutres em Carpazinha, que se juntou a Ordo Realitas após perder seus colegas e família durante uma luta contra o Carniçal Preto da Morte. Após esse incidente, passou a fazer parte da Equipe E, grupo que investigava a manifestação paranormal conhecida como Santo Berço.\r\n\r\nTendo como família apenas sua mãe adotiva, Ivete Beicur, ele se muda para São Paulo e passa a morar com um de seus colegas de equipe, Kaiser. Eles, juntos de mais alguns agentes, formam a Força D, uma equipe destinada a investigar o retorno do primeiro ocultista, Kian.\r\n\r\nUm tempo depois, ele é colocado como líder de um novo grupo, a Equipe Abutres, com o objetivo de encontrar as chamadas Relíquias da Calamidade.	Protetor, Impulsivo, Empático, Excêntrico	Especialista	60	1
+5	Cesar "Kaiser" Cohen	uploads/img_6ada77798668b7.95826282.webp	4	2	4	0	1	T.I. (Tecnologia da Informação)	Cesar "Kaiser" Oliveira Cohen foi um dos protagonistas da série Ordem Paranormal, presente em O Segredo na Floresta e Desconjuração.\r\n\r\nCesar era um programador e hacker brasileiro, residente de São Paulo. Após se juntar à Ordo Realitas, é um dos membros designados ao Caso de Carpazinha. Seu pai, Cristopher, também se revela um membro da Ordem e o acompanha na missão.\r\n\r\nRetornou como protagonista em Ordem Paranormal: Desconjuração, assumindo para si um novo alter ego: Kaiser. Segundo ele, esse nome é utilizado para fugir de si mesmo e parar de criar relações com outras pessoas, por medo de perdê-las. Após a entrada de seu melhor amigo Joui Jouki na Seita das Máscaras, é confiado ao hacker o cargo de líder da Força D, equipe esta que o mesmo nomeou.\r\n\r\nKaiser deixou de existir durante o dia final da Desconjuração, após confrontar Kian e ser alvo de um Ritual de Inexistir realizado pelo Escripta, sacrificando-se pra salvar seus amigos.	Metódico, Frio e Calculista, Paranoico, Excêntrico	Especialista	50	1
 \.
 
 
@@ -366,7 +396,9 @@ COPY public.characters (id, name, img, agi, str, intel, pre, vig, occupation, hi
 --
 
 COPY public.items (id, name, img, type_item, damage, effect, item_range, prestige, description, category, space, critical, damage_type, created_by) FROM stdin;
-3	Pistola	uploads/img_6ad8cb0b50be80.47726085.webp	Arma	1d12	Causa perfuração	Curto/Médio	1	é uma arma de fogo de porte leve, semiautomática e de uso com apenas uma mão. No universo de Ordem Paranormal, ela é uma das ferramentas mais comuns e confiáveis da Ordem (Ordo Realitas), sendo a escolha ideal para agentes que buscam equilíbrio entre agilidade e precisão para enfrentar as ameaças do Outro Lado.	I	1	18	Balístico	1
+3	Pistola	uploads/img_6ad8cb0b50be80.47726085.webp	Arma	1d12	Causa perfuração	Curto/Médio	1	É uma arma de fogo de porte leve, semiautomática e de uso com apenas uma mão. No universo de Ordem Paranormal, ela é uma das ferramentas mais comuns e confiáveis da Ordem (Ordo Realitas), sendo a escolha ideal para agentes que buscam equilíbrio entre agilidade e precisão para enfrentar as ameaças do Outro Lado.	I	1	18	Balístico	1
+4	Lança-Chamas	uploads/img_6ada7108c60e18.25730478.webp	Arma	6d6	Quando um alvo é atingido pelo ataque do lança-chamas, ele sofre o seguinte efeito mecânico:\r\n• Dano Contínuo: O alvo sofre 1d6 pontos de dano de fogo no início de cada um de seus turnos.\r\n• Como Encerrar: O personagem afetado (ou um aliado adjacente) pode gastar uma ação padrão para apagar o fogo. Fazer isso exige passar em um teste de Reflexos (DT 15).\r\n• Interação com o Ambiente: Se o alvo mergulhar em água ou se houver uma condição climática favorável (como chuva torrencial), o efeito é encerrado automaticamente.	Curto	20	O lança-chamas é uma arma tática pesada composta por um projetor metálico de empunhadura dupla conectado, por mangueiras reforçadas, a tanques pressurizados de combustível líquido carregados nas costas do agente. Ao acionar o gatilho, a chama piloto na ponta do cano incendeia uma coluna violenta e ruidosa de fogo viscoso, projetada para incinerar grupos de criaturas e iluminar as sombras do paranormal com um calor sufocante que adere aos alvos e continua a queimar de forma brutal.	III	2	x2	Fogo	1
+5	Katana	uploads/img_6ada72209d6ad5.57348057.webp	Arma	1d10	Mecanicamente no sistema, o efeito da katana é o seu multiplicador de crítico elevado (x3) somado à propriedade de ser uma arma ágil.\r\nQuando você acerta um ataque tirando 19 ou 20 no dado, o dano base de 1d10 é triplicado, tornando-se 3d10 de corte. Além disso, o seu efeito especial permite que ela seja empunhada com apenas uma mão (caso você tenha o poder Ninja Urbano), liberando a outra mão para rituais, escudos ou itens de investigação.	Curto	20	A katana é uma espada de combate corpo a corpo caracterizada por uma lâmina esguia, curva e de gume único, projetada para desferir cortes fluidos, rápidos e de alta precisão. Com uma estrutura leve que prioriza a agilidade e a velocidade do usuário em detrimento da força bruta, ela possui uma empunhadura longa que permite o manuseio firme com uma ou duas mãos, além de um balanço perfeitamente calibrado. Mecanicamente, destaca-se por sua capacidade de causar ferimentos profundos e críticos letais, funcionando como uma arma cirúrgica que transforma o posicionamento correto e o tempo de reação em poder de destruição imediata.	I	2	19/x3	Corte	1
 \.
 
 
@@ -376,6 +408,8 @@ COPY public.items (id, name, img, type_item, damage, effect, item_range, prestig
 
 COPY public.player_characters (id, player_id, character_id) FROM stdin;
 1	38	1
+4	18	4
+5	8	5
 \.
 
 
@@ -452,42 +486,42 @@ COPY public.usertabela (id, username, email, passwd) FROM stdin;
 -- Name: character_items_id_seq; Type: SEQUENCE SET; Schema: public; Owner: ordo
 --
 
-SELECT pg_catalog.setval('public.character_items_id_seq', 3, true);
+SELECT pg_catalog.setval('public.character_items_id_seq', 7, true);
 
 
 --
 -- Name: character_rituals_id_seq; Type: SEQUENCE SET; Schema: public; Owner: ordo
 --
 
-SELECT pg_catalog.setval('public.character_rituals_id_seq', 15, true);
+SELECT pg_catalog.setval('public.character_rituals_id_seq', 20, true);
 
 
 --
 -- Name: character_skills_id_seq; Type: SEQUENCE SET; Schema: public; Owner: ordo
 --
 
-SELECT pg_catalog.setval('public.character_skills_id_seq', 142, true);
+SELECT pg_catalog.setval('public.character_skills_id_seq', 187, true);
 
 
 --
 -- Name: characters_id_seq; Type: SEQUENCE SET; Schema: public; Owner: ordo
 --
 
-SELECT pg_catalog.setval('public.characters_id_seq', 2, true);
+SELECT pg_catalog.setval('public.characters_id_seq', 5, true);
 
 
 --
 -- Name: items_id_seq; Type: SEQUENCE SET; Schema: public; Owner: ordo
 --
 
-SELECT pg_catalog.setval('public.items_id_seq', 3, true);
+SELECT pg_catalog.setval('public.items_id_seq', 5, true);
 
 
 --
 -- Name: player_characters_id_seq; Type: SEQUENCE SET; Schema: public; Owner: ordo
 --
 
-SELECT pg_catalog.setval('public.player_characters_id_seq', 2, true);
+SELECT pg_catalog.setval('public.player_characters_id_seq', 5, true);
 
 
 --
@@ -765,5 +799,5 @@ ALTER TABLE ONLY public.rituals
 -- PostgreSQL database dump complete
 --
 
-\unrestrict lHz8ncfVKGory0ZAE2KGnW3HiUTgyOUfnaWbcM6jULYwDVdfdX3K1poMip30UZD
+\unrestrict LAJFJlBwRTx3K0nvp8Mc7MKAoNyJYZSUajUX9kAnMTjqZeXK1Hf2PAv3EEYPZgD
 

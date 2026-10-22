@@ -10,13 +10,6 @@ CREATE TABLE userTabela (
     email typeEmail UNIQUE NOT NULL,
     passwd TEXT NOT NULL);
 
-CREATE TABLE temporadas (
-    id            INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    name          VARCHAR(255) NOT NULL UNIQUE,
-    ano_de_comeco INTEGER NOT NULL,
-    ano_de_fim    INTEGER,
-    CHECK (ano_de_fim IS NULL OR ano_de_fim >= ano_de_comeco) -- Checa se o ano fim é maior do que o ano de começo
-);
 
 CREATE TABLE players (
     id    INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
@@ -71,12 +64,6 @@ CREATE TABLE rituals (
 );
 
 -- Tabelas de conexão
-CREATE TABLE player_temporadas (
-    id           INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    player_id    INTEGER NOT NULL REFERENCES players(id) ON DELETE CASCADE, -- Conecta com a tabela, fazendo que se o dado pai for deletado, os filhos também são
-    temporada_id INTEGER NOT NULL REFERENCES temporadas(id) ON DELETE CASCADE,
-    UNIQUE (player_id, temporada_id)
-);
 
 CREATE TABLE player_characters (
     id           INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
@@ -108,7 +95,6 @@ CREATE TABLE character_skills (
 );
 
 -- Índices nas FKs (o Postgres não cria automaticamente)
-CREATE INDEX idx_player_temporadas_temporada ON player_temporadas(temporada_id);
 CREATE INDEX idx_player_characters_character ON player_characters(character_id);
 CREATE INDEX idx_character_rituals_ritual    ON character_rituals(ritual_id);
 CREATE INDEX idx_character_items_item        ON character_items(item_id);
