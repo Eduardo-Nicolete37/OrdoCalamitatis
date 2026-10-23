@@ -679,9 +679,30 @@ function downloadImage()
     $caminho_completo = $diretorio_destino . DIRECTORY_SEPARATOR . $novo_nome;
 
     // Move o arquivo da pasta temporária para o destino final
-    if (!move_uploaded_file($arquivo['tmp_name'], $caminho_completo)) {
-        throw new Exception("Erro ao salvar o arquivo no servidor.");
-    }
+    if (!is_uploaded_file($arquivo['tmp_name'])) {
+    throw new Exception("O arquivo temporário não é um upload válido.");
+}
+
+if (!is_dir(dirname($caminho_completo))) {
+    throw new Exception(
+        "A pasta de destino não existe: " . dirname($caminho_completo)
+    );
+}
+
+if (!is_writable(dirname($caminho_completo))) {
+    throw new Exception(
+        "Sem permissão de escrita na pasta: " . dirname($caminho_completo)
+    );
+}
+
+if (!move_uploaded_file($arquivo['tmp_name'], $caminho_completo)) {
+    $ultimo_erro = error_get_last();
+
+    throw new Exception(
+        "Falha ao salvar em: " . $caminho_completo .
+        " | Erro: " . ($ultimo_erro['message'] ?? 'Não identificado')
+    );
+}
 
     // Retorna o caminho relativo, que pode ser gravado no banco e usado no <img>
     return 'uploads/' . $novo_nome;
