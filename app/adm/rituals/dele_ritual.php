@@ -12,9 +12,12 @@ $id_ritual = (int) $_GET['id'];
 $id_user = (int) $_SESSION['id'];
 
 // Verifica se o ritual existe e pertence ao usuário
-$ritual = readSpecificRitual($conexao, $id_user, $id_ritual);
+$ritual = readSpecificRitual($conexao, $id_ritual);
 
 if (!$ritual) {
+    header("Location: /OrdoCalamitatis/app/adm/creations.php");
+    exit;
+} elseif ($id_user !== $ritual['created_by']) {
     header("Location: /OrdoCalamitatis/app/adm/creations.php");
     exit;
 }
