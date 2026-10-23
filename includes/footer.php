@@ -4,7 +4,7 @@
     if (isset($_SESSION['id'])) {
         echo "<a href='/OrdoCalamitatis/app/adm/creations.php'>Suas criações</a>";
     } else {
-        echo "<a href='/OrdoCalamitatis/app/user/history.php'>História</a>";
+        echo "<a href='/OrdoCalamitatis/app/user/chars/charlist.php'>Personagens</a>";
     }
 
     echo "<a href='/OrdoCalamitatis/app/user/assests.php'>Livros</a>";
