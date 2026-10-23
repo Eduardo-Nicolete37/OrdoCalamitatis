@@ -10,7 +10,7 @@ if (!isset($_GET['id']) || !ctype_digit((string) $_GET['id'])) {
 $id_ritual = (int) $_GET['id'];
 $id_user = (int) $_SESSION['id'];
 
-$ritual = readSpecificRitual($conexao, $id_user, $id_ritual);
+$ritual = readSpecificRitual($conexao, $id_ritual);
 
 if (!$ritual) {
     header("Location: /OrdoCalamitatis/app/adm/creations.php");
