@@ -27,7 +27,7 @@ O sistema visa otimizar a pesquisa sobre essas temáticas e estruturar as criaç
     - [Passo 2: Configurar o Banco de Dados](#passo-2-configurar-o-banco-de-dados)
     - [Passo 3: Configurar a Conexão no PHP](#passo-3-configurar-a-conexão-no-php)
     - [Passo 4: Acessar a Aplicação localmente](#passo-4-acessar-a-aplicação-localmente)
-- [3. Estrutura de Diretórios (INCOMPLETO)](#3-estrutura-de-diretórios-incompleto)
+- [3. Estrutura de Diretórios](#3-estrutura-de-diretórios)
 - [4. Especificação de Requisitos](#4-especificação-de-requisitos)
   - [4.1. Requisitos Funcionais](#41-requisitos-funcionais)
   - [4.2. Requisitos Não-Funcionais](#42-requisitos-não-funcionais)
@@ -46,7 +46,6 @@ O sistema visa otimizar a pesquisa sobre essas temáticas e estruturar as criaç
   - [6.2. Fluxo de \[Processo\]](#62-fluxo-de-processo)
 - [7. Protótipos](#7-protótipos)
   - [Baixa Fidelidade:](#baixa-fidelidade)
-  - [Alta Fidelidade:](#alta-fidelidade)
 - [8. Contribuindo](#8-contribuindo)
 - [9. Contato \& Suporte](#9-contato--suporte)
 
@@ -119,12 +118,12 @@ $password = "SUA SENHA DO POSTGRES (ordo) AQUI"; # Altere apenas esse campo
 #### Passo 4: Acessar a Aplicação localmente
 Depois de seguir todos esse passos, você abrirá o terminal e fará os seguintes comandos:
 ```bash
-# No caso de a raiz do projeto não estar aberta, use o comando:
-cd OrdoCalamitatis
+# No caso de a raiz do projeto esteja aberta, use o comando:
+cd ..
 # Caso você deseje rodar a aplicação localmente, execute o comando:
 php -S localhost:8000 
 ```
-Por fim, abra no seu navegador de preferência, digite o URL *localhost:8000*, e aproveite a aplicação.
+Por fim, abra no seu navegador de preferência, digite o URL *localhost:8000/OrdoCalamitatis/*, e aproveite a aplicação.
 
 ---
 
@@ -478,24 +477,28 @@ erDiagram
     }
 
     player_characters {
-        int player_id PK, FK
-        int character_id PK, FK
-    }
-
-    character_skills {
-        int character_id PK, FK
-        varchar skill_name PK
-    }
-
-    character_items {
-        int character_id PK, FK
-        int item_id PK, FK
-        int quantity "CHECK > 0"
+        int id PK
+        int player_id FK
+        int character_id FK
     }
 
     character_rituals {
-        int character_id PK, FK
-        int ritual_id PK, FK
+        int id PK
+        int character_id FK
+        int ritual_id FK
+    }
+
+    character_items {
+        int id PK
+        int character_id FK
+        int item_id FK
+        int quantity "NOT NULL DEFAULT 1 CHECK > 0"
+    }
+
+    character_skills {
+        int id PK
+        int character_id FK
+        varchar skill "NOT NULL"
     }
 
     userTabela o|--o{ characters : "cria"
@@ -509,6 +512,7 @@ erDiagram
     characters ||--o{ character_rituals : "possui"
     rituals ||--o{ character_rituals : "integra"
 ```
+
 ### 6.2. Fluxo de Processo
 
 ```mermaid
