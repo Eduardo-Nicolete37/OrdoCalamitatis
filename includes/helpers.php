@@ -63,8 +63,8 @@ function criaPersonagem(
         $conexao->commit();
         return true;
     } catch (Throwable $e) {
-        if ($conexao->inTransaction()) {
-            $conexao->rollBack();
+        if ($conexao->inTransaction()) { // serve para verificar se existe uma transação ativa no momento. Ele retorna um valor booleano (true ou false).
+            $conexao->rollBack(); // serve para cancelar todas as alterações feitas no banco de dados desde o início da transação.
         }
         throw $e;
     }
