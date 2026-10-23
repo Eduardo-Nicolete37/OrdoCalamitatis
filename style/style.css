@@ -208,7 +208,7 @@ main.ficha h1 {
     margin: 0 0 12px;
     padding-bottom: 6px;
     border-bottom: 1px solid var(--border);
-    font-size: 1.1rem;
+    font-size: 1rem;
     text-align: left;
 }
 
@@ -231,14 +231,16 @@ main.ficha h1 {
 .atributos dt {
     color: var(--cor, var(--text-muted));
     font-family: var(--font-title);
-    font-size: 0.75rem;
-    overflow-wrap: anywhere;
+    font-size: 0.65rem;
+    overflow-wrap: normal;
+    word-break: normal;
+    hyphens: none;
 }
 
 .atributos dd {
     margin: 4px 0 0;
     font-family: var(--font-title);
-    font-size: 1.5rem;
+    font-size: 1.3rem;
 }
 
 .atr-agi   { --cor: var(--el-energia); }
