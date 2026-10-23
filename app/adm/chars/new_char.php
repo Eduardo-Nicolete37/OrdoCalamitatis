@@ -1,6 +1,6 @@
 <?php
-require_once __DIR__ . '\..\..\..\login\verifica_user.php';
-require_once __DIR__ . '\..\..\..\includes\helpers.php';
+require_once __DIR__ . '/../../../login/verifica_user.php';
+require_once __DIR__ . '/../../../includes/helpers.php';
 
 $erro = null;
 
